@@ -25,7 +25,7 @@ object Stocks extends App {
   // Note: assert period2 > period1
   val period1 = 1546318799 // 2019-01-01 00:00:00
   val period2 = 1609477199 // 2024-05-31 23:59:59
-  val interval = "1d"
+  val interval = "1m" // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
   val events = "history"
   val symbol = "SPY"
   val client = HttpClient.newHttpClient()
