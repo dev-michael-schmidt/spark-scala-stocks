@@ -45,10 +45,10 @@ object Stocks extends App {
   private val response = client.send(request, BodyHandlers.ofString)
 
   private val splitIntoLines = response.body.split('\n')
-  private val linesIntoRows = splitIntoLines.map(row => row.split(','))
+  private val linesIntoRowElements = splitIntoLines.map(row => row.split(','))
 
-  private val colNames = linesIntoRows.head.map(name => name.toLowerCase.replace(' ', '_'))
-  private val data = linesIntoRows.tail.map { rows =>
+  private val colNames = linesIntoRowElements.head.map(name => name.toLowerCase.replace(' ', '_'))
+  private val data = linesIntoRowElements.tail.map { rows =>
     val date = stringToDate(rows.head)
     val values = rows.tail.map(_.toDouble)
     Row.fromSeq(date +: values)
@@ -56,8 +56,8 @@ object Stocks extends App {
 
   val schema = StructType(
      // first is date +: rest are doubles
-    StructField("Date", DateType, false) +:
-    colNames.tail.map(name => StructField(name, DoubleType, true))
+    StructField("Date", DateType, nullable = false) +:
+    colNames.tail.map(name => StructField(name, DoubleType, nullable = true))
   )
 
   val stocksDF = spark.createDataFrame(spark.sparkContext.parallelize(data), schema)
