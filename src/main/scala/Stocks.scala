@@ -45,10 +45,10 @@ object Stocks extends App {
   private val response = client.send(request, BodyHandlers.ofString)
 
   private val splitIntoLines = response.body.split('\n')
-  private val linesIntoRowElements = splitIntoLines.map(row => row.split(','))
+  private val rowElements = splitIntoLines.map(row => row.split(','))
 
-  private val colNames = linesIntoRowElements.head.map(name => name.toLowerCase.replace(' ', '_'))
-  private val data = linesIntoRowElements.tail.map { rows =>
+  private val colNames = rowElements.head.map(name => name.toLowerCase.replace(' ', '_'))
+  private val data = rowElements.tail.map { rows =>
     val date = stringToDate(rows.head)
     val values = rows.tail.map(_.toDouble)
     Row.fromSeq(date +: values)
