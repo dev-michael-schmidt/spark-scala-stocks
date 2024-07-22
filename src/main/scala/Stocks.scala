@@ -1,13 +1,15 @@
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
-import org.apache.spark.sql.types.{DateType, DoubleType, StringType, StructField, StructType}
-
-import java.sql.Date
-import java.text.SimpleDateFormat
+import org.apache.spark.sql.types.{DateType, DoubleType, StructField, StructType}
+import org.apache.spark.sql.{Row, SparkSession}
 
 import java.net.URI
-import java.net.http.{HttpClient, HttpRequest}
 import java.net.http.HttpResponse.BodyHandlers
+import java.net.http.{HttpClient, HttpRequest}
+import java.sql.Date
+import java.text.SimpleDateFormat
+import scala.math.BigDecimal.RoundingMode
+
+import Technicals.DailyMovingAverage
 
 
 object Stocks extends App {
@@ -22,11 +24,18 @@ object Stocks extends App {
     new Date(format.parse(dateStr).getTime) // Unix Epoch
   }
 
-  // Note: assert period2 > period1
-  val period1 = 1546318799 // 2019-01-01 00:00:00
-  val period2 = 1609477199 // 2024-05-31 23:59:59
-  val interval = "1m" // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
+  /* Notes:
+   * Assert period2 > period1.
+   * We use daily data.  Yahoo Finance's API has restrictions on how much data based on interval size.
+   * While values [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo] are acceptable, daily (1d)
+   * granularity as this affords us several years. (nearly 25y as of this writing)
+   */
+  //val period1 = 946706400 // 2000-01-01 00:00:00
+  val period1 = 1709272800 // 2024-03-01 00:00:00
+  val period2 = 1717217999 // 2024-05-31 23:59:59
+  val interval = "1d" // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo,
   val events = "history"
+
   val symbol = "SPY"
   val client = HttpClient.newHttpClient()
 
@@ -43,29 +52,25 @@ object Stocks extends App {
     .build()
 
   private val response = client.send(request, BodyHandlers.ofString)
-
   private val splitIntoLines = response.body.split('\n')
   private val rowElements = splitIntoLines.map(row => row.split(','))
 
   private val colNames = rowElements.head.map(name => name.toLowerCase.replace(' ', '_'))
-  private val data = rowElements.tail.map { rows =>
+  private val rowData = rowElements.tail.map { rows =>
     val date = stringToDate(rows.head)
-    val values = rows.tail.map(_.toDouble)
+    val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
     Row.fromSeq(date +: values)
   }
 
   val schema = StructType(
-     // first is date +: rest are doubles
-    StructField("Date", DateType, nullable = false) +:
+      // first is date +: rest are doubles
+    StructField("date", DateType, nullable = false) +:
     colNames.tail.map(name => StructField(name, DoubleType, nullable = true))
   )
 
-  val stocksDF = spark.createDataFrame(spark.sparkContext.parallelize(data), schema)
-
-  val resultStocksDF = stocksDF
+  val stockHistoryDF = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
     .withColumn("symbol", lit(symbol))
-    .withColumn("open", round(col("open")))
-    .withColumn("open", round(col("open"), 4))
-    .withColumn("close", round(col("close"), 4))
-    .drop("high", "low", "adj_close")
+
+  val foo = new DailyMovingAverage(stockDataFrame = stockHistoryDF, days = 10)
+  foo.add().show()
 }
