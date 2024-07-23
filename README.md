@@ -1,4 +1,4 @@
-# Spark-Scala=Stocks
+# Spark-Scala-Stocks
 
 ### A back-end demo project that:
 
