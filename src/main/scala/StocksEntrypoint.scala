@@ -1,6 +1,7 @@
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DateType, DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
+import technicals.TechnicalBuilder
 
 import java.net.URI
 import java.net.http.HttpResponse.BodyHandlers
@@ -9,10 +10,7 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import scala.math.BigDecimal.RoundingMode
 
-import Technicals.DailyMovingAverage
-
-
-object Stocks extends App {
+object StocksEntrypoint extends App {
 
   val spark = SparkSession.builder()
     .config("spark.master", "local")
@@ -71,6 +69,10 @@ object Stocks extends App {
   val stockHistoryDF = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
     .withColumn("symbol", lit(symbol))
 
-  val foo = new DailyMovingAverage(stockDataFrame = stockHistoryDF, days = 10)
-  foo.add().show()
+  val stockHistoryWithTechnicals = TechnicalBuilder(stockHistoryDF)
+    .SMA(10)
+    .EMA(10)
+    .build()
+
+  stockHistoryWithTechnicals.show()
 }
