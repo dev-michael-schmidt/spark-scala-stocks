@@ -1,12 +1,11 @@
-name := "spark-essentials"
+name := "spark-scala-stocks"
 
 version := "0.2"
 
 scalaVersion := "2.13.12"
 
-val sparkVersion = "3.5.0"
-val postgresVersion = "42.6.0"
-val log4jVersion = "2.20.0"
+val sparkVersion = "3.5.1"
+val log4jVersion = "2.23.1"
 
 resolvers ++= Seq(
   "bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven",
@@ -21,6 +20,8 @@ libraryDependencies ++= Seq(
   // logging
   "org.apache.logging.log4j" % "log4j-api" % log4jVersion,
   "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
-  // postgres for DB connectivity
-  "org.postgresql" % "postgresql" % postgresVersion
+
+  "org.jmockit" % "jmockit" % "1.49",
+
+
 )
