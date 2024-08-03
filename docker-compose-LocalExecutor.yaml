@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
+  webserver:
+    image: apache/airflow
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=Local
+    logging:
+      options:
+        max-size: 50m
+        max-file: "10"
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+        # - ./plugins:/usr/local/airflow/plugins
+    ports:
+      - "8085:8080"
+    entrypoint: ["sh", "-c",  "airflow db init && airflow scheduler && airflow webserver"]  # airflow db init &&
+    # Notes:
+
+    # Create an adimn
+    # airflow users \
+    # create --role Admin \
+    # --username admin \
+    # --email admin \
+    # --firstname admin \
+    # --lastname admin \
+    # --password admin
+
+    # Start the schedular:
+    # airflow scheduler
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  redis:
+    image: redis
+volumes:
+  postgres_data:
+
