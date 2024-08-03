@@ -13,42 +13,49 @@ services:
         max-file: 10
 
   webserver:
-    image: apache/airflow
-    restart: always
+    image: apache/airflow:2.9.3
     depends_on:
       - postgres
-      - redis
     environment:
-      - LOAD_EX=n
-      - EXECUTOR=Local
-    logging:
-      options:
-        max-size: 50m
-        max-file: "10"
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
     volumes:
       - ./dags:/usr/local/airflow/dags
-        # - ./plugins:/usr/local/airflow/plugins
+      - ./logs:/opt/airflow/logs
     ports:
       - "8085:8080"
-    entrypoint: ["sh", "-c",  "airflow db init && airflow scheduler && airflow webserver"]  # airflow db init &&
-    # Notes:
+    entrypoint: [ "airflow", "webserver" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail http://localhost:8080/health" ]
+      interval: 30s
+      retries: 3
 
-    # Create an adimn
-    # airflow users \
-    # create --role Admin \
-    # --username admin \
-    # --email admin \
-    # --firstname admin \
-    # --lastname admin \
-    # --password admin
+  scheduler:
+    image: apache/airflow:2.9.3
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./logs:/opt/airflow/logs
+    entrypoint: [ "airflow", "scheduler"] #"db", "init" ] # the DB must be init first.  Uncomment, then run original
+    # Notes: users don't exist by default.  Create one (in an attached terminal)
+    #    airflow users \
+    #    create --role Admin \
+    #    --username admin \
+    #    --email admin \
+    #    --firstname admin \
+    #    --lastname admin \
+    #    --password admin
+
 
     # Start the schedular:
     # airflow scheduler
-    healthcheck:
-      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
 
   redis:
     image: redis
