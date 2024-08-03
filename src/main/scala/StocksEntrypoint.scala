@@ -75,7 +75,5 @@ object StocksEntrypoint extends App {
     .EMA(10)
     .build()
 
-  val foo = RestAPIBatchFetch(1722607200, "SPY")
-
   stockHistoryWithTechnicals.show()
 }
