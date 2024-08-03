@@ -1,5 +1,14 @@
 # Project exclude paths
 /project/project/target/
 /project/target/
-/target/
+
 /target/scala-2.13/classes/
+/target/
+
+
+/logs/*
+/out/*
+/postgres_data/*
+
+/.bloop
+/.bsp
