@@ -1,6 +1,7 @@
+import SparkSessionProvider.getSparkSession
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DateType, DoubleType, StructField, StructType}
-import org.apache.spark.sql.{Row, SparkSession}
 import technicals.TechnicalBuilder
 
 import java.net.URI
@@ -12,11 +13,7 @@ import scala.math.BigDecimal.RoundingMode
 
 object StocksEntrypoint extends App {
 
- val spark = SparkSession.builder()
-   .config("spark.master", "local")
-   .appName("foo")
-   .getOrCreate()
-  //val spark = getSparkSession
+  val spark = getSparkSession
 
   def stringToDate(dateStr: String): Date = {
     val format = new SimpleDateFormat("yyyy-MM-dd")
