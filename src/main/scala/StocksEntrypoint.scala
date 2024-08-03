@@ -12,10 +12,11 @@ import scala.math.BigDecimal.RoundingMode
 
 object StocksEntrypoint extends App {
 
-  val spark = SparkSession.builder()
-    .config("spark.master", "local")
-    .appName("SparkScalaStocks")
-    .getOrCreate()
+ val spark = SparkSession.builder()
+   .config("spark.master", "local")
+   .appName("foo")
+   .getOrCreate()
+  //val spark = getSparkSession
 
   def stringToDate(dateStr: String): Date = {
     val format = new SimpleDateFormat("yyyy-MM-dd")
@@ -73,6 +74,8 @@ object StocksEntrypoint extends App {
     .SMA(10)
     .EMA(10)
     .build()
+
+  val foo = RestAPIBatchFetch(1722607200, "SPY")
 
   stockHistoryWithTechnicals.show()
 }
