@@ -22,7 +22,6 @@ services:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
     volumes:
-      - ./dags:/usr/local/airflow/dags
       - ./logs:/opt/airflow/logs
     ports:
       - "8085:8080"
@@ -38,10 +37,11 @@ services:
       - postgres
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
     volumes:
-      - ./dags:/usr/local/airflow/dags
+      - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
     entrypoint: [ "airflow", "scheduler"] #"db", "init" ] # the DB must be init first.  Uncomment, then run original
     # Notes: users don't exist by default.  Create one (in an attached terminal)
