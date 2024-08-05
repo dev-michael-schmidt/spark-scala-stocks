@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: bacongobbler/azure-blob-storage-upload@v3.0.0
         with:
-          source_dir: /dags
+          source_dir: dags
           container_name: dags
           # connection_string: ${{ secrets.ConnectionString }}
           # extra_args: '--pattern *.tar.gz'
