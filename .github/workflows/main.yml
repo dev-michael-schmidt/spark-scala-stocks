@@ -11,7 +11,7 @@ jobs:
       - uses: bacongobbler/azure-blob-storage-upload@main
         with:
           source_dir: /dags
-          container_name: sss-uploadblob-ga
+          container_name: dags
           connection_string: ${{ secrets.ConnectionString }}
           # extra_args: '--pattern *.tar.gz'
           # WARNING: this will overwrite existing blobs in your blob storage
