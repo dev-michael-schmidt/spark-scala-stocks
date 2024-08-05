@@ -12,7 +12,6 @@ jobs:
         with:
           source_dir: dags
           container_name: dags
-          connection_string: ${az storage account show-connection-string}
           # extra_args: '--pattern *.tar.gz'
           # WARNING: this will overwrite existing blobs in your blob storage
           overwrite: 'true'
