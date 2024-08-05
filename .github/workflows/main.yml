@@ -12,7 +12,7 @@ jobs:
         with:
           source_dir: dags
           container_name: dags
-          connection_string: $INPUT_CONNECTION_STRING
+          connection_string: INPUT_CONNECTION_STRING
           # extra_args: '--pattern *.tar.gz'
           # WARNING: this will overwrite existing blobs in your blob storage
           overwrite: 'true'
