@@ -13,6 +13,7 @@
 /.bloop
 /.bsp
 /.idea
+/.metals
 project/.bloop/bloop.settings.json
 project/.bloop/spark-scala-stocks-build.json
 project/build.properties
