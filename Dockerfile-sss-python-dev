@@ -1,0 +1,10 @@
+FROM python:3.12
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+RUN mkdir app
+
+COPY src/main/python /app
+
+WORKDIR /app
+CMD ["/usr/bin/bash"]

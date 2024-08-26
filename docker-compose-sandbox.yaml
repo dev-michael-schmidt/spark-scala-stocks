@@ -1,0 +1,65 @@
+services:
+  sss_postgres:
+    image: postgres:16.3
+    container_name: sss_postgres
+    hostname: sss_postgres
+    env_file:
+      - ".env"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/schemas:/var/lib/postgresql/schemas
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
+  sss_webserver:
+    image: apache/airflow:2.9.3
+    container_name: sss_webserver
+    hostname: sss_webserver
+    depends_on:
+      - sss_postgres
+      - sss_scheduler
+    env_file:
+      - ".env"
+    volumes:
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8888:8080"
+    entrypoint: [ "airflow", "webserver" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail http://localhost:8080/health" ]
+      interval: 30s
+      retries: 3
+
+  sss_scheduler:
+    image: apache/airflow:2.9.3
+    container_name: sss_scheduler
+    hostname: sss_scheduler
+    depends_on:
+      - sss_postgres
+    env_file:
+      - ".env"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    entrypoint: [ "airflow", "scheduler"] #"db", "init" ] # the DB must be init first.  Uncomment, then run original
+    # Notes: users don't exist by default.  Create one (in an attached terminal)
+    #    airflow users \
+    #    create --role Admin \
+    #    --username admin \
+    #    --email admin \
+    #    --firstname admin \
+    #    --lastname admin \
+    #    --password admin
+
+    # Start the schedular:
+    # airflow scheduler
+
+  redis:
+    image: redis
+    container_name: sss_redis
+volumes:
+  postgres_data:
