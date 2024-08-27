@@ -16,7 +16,7 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>4.9.2</version>
         <executions>
           <execution>
             <id>compile</id>
@@ -83,19 +83,22 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
         <configuration>
-        <archive>
+          <archive>
             <manifest>
-                <addClasspath>true</addClasspath>
-                <classpathPrefix>lib/</classpathPrefix>
-                <mainClass>org.sss.core.LoadSymbol</mainClass>
+              <addClasspath>true</addClasspath>
+<!--                <classpathPrefix>lib/</classpathPrefix>--> <!-- disabled and likely incorrect, was enabled -->
+              <mainClass>org.sss.core.LoadSymbol</mainClass>
             </manifest>
-        </archive>
-    </configuration>
+          </archive>
+          <outputDirectory>libs</outputDirectory>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
         <configuration>
           <source>11</source>
           <target>11</target>
@@ -152,7 +155,7 @@
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>2.0.12</version>
+        <version>2.0.16</version> <!-- was .12 -->
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
     <dependency>
