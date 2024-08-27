@@ -4,10 +4,10 @@ services:
   python-debug:
     image: sss-python-dev:latest
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile-sss-python-dev
     env_file:
-      - ".env"
+      - "../.env"
     environment:      # This section overrides the .env file declarations
       - VAR=VAL
     stdin_open: true  # Keeps the container open even if not attached

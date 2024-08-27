@@ -4,7 +4,7 @@ services:
     container_name: sss_postgres
     hostname: sss_postgres
     env_file:
-      - ".env"
+      - "../.env"
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +23,7 @@ services:
       - sss_postgres
       - sss_scheduler
     env_file:
-      - ".env"
+      - "../.env"
     volumes:
       - ./logs:/opt/airflow/logs
     ports:
@@ -41,7 +41,7 @@ services:
     depends_on:
       - sss_postgres
     env_file:
-      - ".env"
+      - "../.env"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
