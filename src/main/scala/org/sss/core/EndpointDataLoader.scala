@@ -26,7 +26,7 @@ object EndpointDataLoader {
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
   private val schema = Common.yahooAPISchema
 
-  private val url = s"jdbc:postgresql://localhost:5432/$database" // TODO actually parameterize this, hardcoding is terrible!!
+  private val url = s"jdbc:postgresql://localhost:5432/$database" // TODO parameterize this?
 
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
@@ -63,7 +63,7 @@ object EndpointDataLoader {
 
     dataFrame
   }
-
+  //noinspection AccessorLikeMethodIsUnit
   def toDatabase(dataFrame: DataFrame, table: String): Unit = {
 
     dataFrame.write
