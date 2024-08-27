@@ -47,7 +47,7 @@ object EndpointDataLoader {
     val rowData = rowElements.tail.map { rows =>
       val date = rows.head // The Date column
       val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
-      Row.fromSeq(date.toString +: values)
+      Row.fromSeq(date +: values)
     }
 
     val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
