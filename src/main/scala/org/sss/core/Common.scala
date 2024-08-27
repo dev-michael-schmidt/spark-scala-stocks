@@ -13,4 +13,5 @@ object Common {
       StructField("Adj Close", DoubleType, nullable = true),
       StructField("Volume", DoubleType, nullable = true)
     ))
+  val YAHOO_FINANCE_ENDPOINT = "https://query1.finance.yahoo.com/v7/finance/download/"
 }
