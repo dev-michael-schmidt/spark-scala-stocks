@@ -1,6 +1,5 @@
 package org.sss.core
 
-
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
@@ -25,13 +24,14 @@ object EndpointDataLoader {
   private val password = System.getenv("POSTGRES_PASSWORD")
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
+  private val schema = Common.yahooAPISchema
 
   private val url = s"jdbc:postgresql://localhost:5432/$database" // TODO actually parameterize this, hardcoding is terrible!!
 
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
-    .uri(URI.create(s"https://query1.finance.yahoo.com/v7/finance/download/" +
+    .uri(URI.create(s"${Common.YAHOO_FINANCE_ENDPOINT}" +
       s"$symbol?" +
       s"period1=$period1&" +
       s"period2=$period2&" +
@@ -50,16 +50,6 @@ object EndpointDataLoader {
       Row.fromSeq(date.toString +: values)
     }
 
-    // val schema = spark.read.json("src/main/resources/schemas/y_prices.json").schema
-    val schema = StructType(Array(
-      StructField("Date", StringType, nullable = true),
-      StructField("Open", DoubleType, nullable = true),
-      StructField("High", DoubleType, nullable = true),
-      StructField("Low", DoubleType, nullable = true),
-      StructField("Close", DoubleType, nullable = true),
-      StructField("Adj Close", DoubleType, nullable = true),
-      StructField("Volume", DoubleType, nullable = true)
-    ))
     val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
       .withColumn("symbol", lit(symbol))
       .withColumnRenamed("Open", "open")
@@ -74,7 +64,7 @@ object EndpointDataLoader {
     dataFrame
   }
 
-  def toDatabase(dataFrame: DataFrame, table: String) = {
+  def toDatabase(dataFrame: DataFrame, table: String): Unit = {
 
     dataFrame.write
       .format("jdbc")
@@ -87,7 +77,7 @@ object EndpointDataLoader {
       .save()
   }
 
-  def fromDatabase(table: String) = {
+  def fromDatabase(table: String): DataFrame = {
 
     val dataFrame = spark.read
       .format("jdbc")
