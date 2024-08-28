@@ -1,7 +1,9 @@
 #!/bin/bash
-docker exec -it sss_postgres psql -U postgres -c "CREATE DATABASE stocks;"
-docker exec -it sss_postgres psql -U postgres -c "CREATE USER airflow SUPERUSER PASSWORD 'airflow';"
-docker exec -it sss_postgres psql -U "ALL PRIVILEGES ON DATABASE stocks TO airflow;"
+#docker exec -it sss_postgres psql -U postgres -c "CREATE DATABASE stocks;"
+# user airflow seems to exist
+#docker exec -it sss_postgres psql -U airflow -d stocks -c "CREATE USER airflow SUPERUSER PASSWORD 'airflow';"
+#docker exec -it sss_postgres psql -U airflow -d stocks -c "GRANT ALL PRIVILEGES ON DATABASE stocks TO airflow;"
+# use schema to create a table (can you "pipe" the schema: like -c "{piped_schema_file(s)}"
 
 echo "==================     Help for psql   ========================="
 echo "\\dt		: Describe the current database"
