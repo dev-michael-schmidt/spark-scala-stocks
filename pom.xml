@@ -13,62 +13,57 @@
     <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
       <!-- mixed scala/java compile -->
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>4.9.2</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>compile</phase>
-          </execution>
-          <execution>
-            <id>test-compile</id>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-            <phase>test-compile</phase>
-          </execution>
-          <execution>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>make-assembly</id> <!-- this is used for inheritance merges -->
-            <phase>package</phase> <!-- bind to the packaging phase -->
-            <goals>
-              <goal>single</goal>
-            </goals>
-        </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>net.alchim31.maven</groupId>-->
+<!--        <artifactId>scala-maven-plugin</artifactId>-->
+<!--        <version>4.9.2</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>compile</id>-->
+<!--            <goals>-->
+<!--              <goal>compile</goal>-->
+<!--            </goals>-->
+<!--            <phase>compile</phase>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <id>test-compile</id>-->
+<!--            <goals>-->
+<!--              <goal>testCompile</goal>-->
+<!--            </goals>-->
+<!--            <phase>test-compile</phase>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <phase>process-resources</phase>-->
+<!--            <goals>-->
+<!--              <goal>compile</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
+<!--            <phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
+<!--            <goals>-->
+<!--              <goal>single</goal>-->
+<!--            </goals>-->
+<!--        </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
       <!-- for fatjar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.7.1</version>
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.sss.core.LoadSymbol</mainClass>
+              <mainClass>org.sss.core.InitializeDatabase</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
           <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>libs</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -79,21 +74,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.4.2</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-<!--                <classpathPrefix>lib/</classpathPrefix>--> <!-- disabled and likely incorrect, was enabled -->
-              <mainClass>org.sss.core.LoadSymbol</mainClass>
-            </manifest>
-          </archive>
-          <outputDirectory>libs</outputDirectory>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -138,6 +118,12 @@
     </pluginManagement>
   </build>
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.13.12</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
       <groupId>org.apache.spark</groupId>
