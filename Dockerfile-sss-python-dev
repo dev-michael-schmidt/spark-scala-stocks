@@ -4,7 +4,7 @@ RUN pip install -r requirements.txt
 
 RUN mkdir app
 
-COPY src/main/python /app
+COPY src/python /app
 
 WORKDIR /app
 CMD ["/usr/bin/bash"]
