@@ -1,9 +1,25 @@
 services:
+
+  sss_portainer:
+    image: portainer/portainer-ce:2.21.0
+    container_name: sss_portainer
+    hostname: sss_portainer
+    domainname: sss_portainer.home.lan
+    restart: always
+    ports:
+      - 8088:8000
+      - 9443:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
   sss_postgres:
     image: postgres:16.3
     container_name: sss_postgres
     hostname: sss_postgres
     domainname: sss_postgres.home.lan
+    depends_on:
+      - sss_portainer
     env_file:
       - ".env"
     ports:
@@ -20,15 +36,17 @@ services:
     image: apache/airflow:2.9.3
     container_name: sss_webserver
     hostname: sss_webserver
+    domainname: sss_webserver.home.lan
     depends_on:
-      - sss_postgres
       - sss_scheduler
+      - sss_portainer
     env_file:
       - ".env"
     volumes:
       - ./logs:/opt/airflow/logs
     ports:
       - "8888:8080"
+      - "9443:9443"
     entrypoint: [ "airflow", "webserver" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl --silent --fail http://localhost:8080/health" ]
@@ -39,8 +57,10 @@ services:
     image: apache/airflow:2.9.3
     container_name: sss_scheduler
     hostname: sss_scheduler
+    domainname: sss_scheduler.home.lan
     depends_on:
       - sss_postgres
+      - sss_portainer
     env_file:
       - ".env"
     volumes:
@@ -51,29 +71,17 @@ services:
     entrypoint: [ "airflow", "scheduler"]
     # entrypoint: [ "airflow", "db", "init" ] # the DB must be init first.
     # Notes: users don't exist by default.  Create one (in an attached terminal)
-    #    airflow users \
-    #    create --role Admin \
-    #    --username admin \
-    #    --email admin \
-    #    --firstname admin \
-    #    --lastname admin \
-    #    --password admin
+#        airflow users \
+#        create --role Admin \
+#        --username admin \
+#        --email admin \
+#        --firstname admin \
+#        --lastname admin \
+#        --password admin
     # Permission error? sudo chown 50000:0 dags logs plugins
 
     # Start the schedular:
     # airflow scheduler
-
-  portainer-ce:
-    image: portainer/portainer-ce:2.21.0
-    container_name: sss_portainer
-    hostname: sss_portainer
-    restart: always
-    ports:
-      - 8088:8000
-      - 9443:9443
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
 
 volumes:
   postgres_data:
