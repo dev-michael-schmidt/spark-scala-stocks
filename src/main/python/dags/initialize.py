@@ -3,13 +3,26 @@ from datetime import datetime
 
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 
-def hello_world():
-    print('hello world')
+env_vars = {
+    'APP_NAME': 'SparkScalaStocks',
+    'P1': 1719842400,
+    'P2': 1722520800,
+    'INTERVAL': '1d',
+    'SYMBOL': 'SPY',
+    'EVENTS': 'history',
+    'POSTGRES_USER': 'airflow',
+    'POSTGRES_PASSWORD': 'airflow',
+    'POSTGRES_DB': 'stocks',
+    'PRICES': 'prices',
+    'DB_SAVE_MODE': 'overwrite',
+    'DB_DRIVER': 'org.postgresql.Driver',
+}
 
 with DAG(dag_id="hello_world_dag",
-         start_date=datetime(2024,6,1),
+         start_date=datetime(2024, 6, 1),
          schedule_interval="@hourly",
          catchup=False) as dag:
-
-
-    initialize = SparkSubmitOperator(application='doo')
+    initialize = SparkSubmitOperator(task_id="BAAAAAZZZZ",
+                                     application='/opt/airflow/libs/sss-0.1-bar.jar',
+                                     env_vars=env_vars
+                                     )
