@@ -3,12 +3,13 @@ services:
     image: postgres:16.3
     container_name: sss_postgres
     hostname: sss_postgres
+    domainname: sss_postgres.home.lan
     env_file:
-      - "../.env"
+      - ".env"
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
       - ./src/main/resources/schemas:/var/lib/postgresql/schemas
     logging:
       options:
@@ -23,7 +24,7 @@ services:
       - sss_postgres
       - sss_scheduler
     env_file:
-      - "../.env"
+      - ".env"
     volumes:
       - ./logs:/opt/airflow/logs
     ports:
@@ -41,11 +42,14 @@ services:
     depends_on:
       - sss_postgres
     env_file:
-      - "../.env"
+      - ".env"
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./src/main/python/dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
-    entrypoint: [ "airflow", "scheduler"] #"db", "init" ] # the DB must be init first.  Uncomment, then run original
+      - ./plugins:/opt/airflow/plugins
+      - ./libs:/opt/airflow/libs
+    entrypoint: [ "airflow", "scheduler"]
+    # entrypoint: [ "airflow", "db", "init" ] # the DB must be init first.
     # Notes: users don't exist by default.  Create one (in an attached terminal)
     #    airflow users \
     #    create --role Admin \
@@ -54,12 +58,25 @@ services:
     #    --firstname admin \
     #    --lastname admin \
     #    --password admin
+    # Permission error? sudo chown 50000:0 dags logs plugins
 
     # Start the schedular:
     # airflow scheduler
 
-  redis:
-    image: redis
-    container_name: sss_redis
+  portainer-ce:
+    image: portainer/portainer-ce:2.21.0
+    container_name: sss_portainer
+    hostname: sss_portainer
+    restart: always
+    ports:
+      - 8088:8000
+      - 9443:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
 volumes:
   postgres_data:
+  portainer_data:
+#    external: true
+#    name: portainer_data
