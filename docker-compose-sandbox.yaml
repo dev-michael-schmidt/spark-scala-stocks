@@ -8,7 +8,7 @@ services:
     restart: always
     ports:
       - 8088:8000
-      - 9443:9443
+      - 8443:8443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -54,7 +54,8 @@ services:
       retries: 3
 
   sss_scheduler:
-    image: apache/airflow:2.9.3
+    # image: apache/airflow:2.9.3
+    image: my-airflow:latest
     container_name: sss_scheduler
     hostname: sss_scheduler
     domainname: sss_scheduler.home.lan
@@ -67,7 +68,7 @@ services:
       - ./src/main/python/dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-      - ./libs:/opt/airflow/libs
+      - ./lib:/opt/airflow/libs
     entrypoint: [ "airflow", "scheduler"]
     # entrypoint: [ "airflow", "db", "init" ] # the DB must be init first.
     # Notes: users don't exist by default.  Create one (in an attached terminal)
