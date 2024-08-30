@@ -11,5 +11,6 @@ object LoadSymbol {
     val symbolDataFrame = fromAPI()
     toDatabase(symbolDataFrame, table)
 
+    println("we've reached the end")
   }
 }
