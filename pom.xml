@@ -60,10 +60,10 @@
             </manifest>
           </archive>
           <descriptorRefs>
-            <descriptorRef>load_symbol</descriptorRef>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <appendAssemblyId>true</appendAssemblyId>
-          <outputDirectory>lib</outputDirectory>
+          <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>libs/load_symbol</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -122,18 +122,18 @@
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>2.13.12</version>
+      <version>2.12.19</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.13</artifactId>
+      <artifactId>spark-core_2.12</artifactId>
       <version>3.5.2</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.13</artifactId>
+      <artifactId>spark-sql_2.12</artifactId>
       <version>3.5.2</version>
       <!-- <scope>provided</scope> -->
     </dependency>
