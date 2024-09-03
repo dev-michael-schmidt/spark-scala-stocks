@@ -63,7 +63,7 @@
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
           <appendAssemblyId>false</appendAssemblyId>
-          <outputDirectory>libs/load_symbol</outputDirectory>
+           <outputDirectory>dags/jars</outputDirectory>
         </configuration>
         <executions>
           <execution>
