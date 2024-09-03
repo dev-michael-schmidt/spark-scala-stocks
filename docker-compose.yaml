@@ -112,16 +112,6 @@ services:
     healthcheck:
       test: [ 'CMD', 'portainer', '--healthcheck' ]
 
-#  sss_loadsymbol:
-#    image: foobar
-#    build: .
-#    container_name: sss_loadsymbol
-#    depends_on:
-#      - sss_scheduler
-#    env_file:
-#      - ".env"
-#    healthcheck: "todo"
-
   sss-postgres:
     image: postgres:13-alpine
     container_name: sss-postgres
@@ -341,6 +331,16 @@ services:
       <<: *airflow-common-depends-on
       sss-airflow-init:
         condition: service_completed_successfully
+
+  sss-grafana:
+    image: grafana/grafana
+    container_name: sss-grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - sss-postgres
+    volumes:
+      - ./data/grafana_data:/var/lib/grafana
 
 volumes:
   postgres_data:
