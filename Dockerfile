@@ -1,65 +1,37 @@
-# Base image to create user with specific UID and GID and java
-FROM amazoncorretto:11.0.24-alpine AS sss-base-java
-# Create a user with specific UID and GID
+##
+# This custom Apache Airflow image adds Amazon's corretto-11.0.24. Amazon
+# Corretto 11 is a free, multi-platform distribution of OpenJDK 11 that
+# is certified to be compatible with the Java SE standard and is a
+# Long-Term Supported (LTS) distribution.
+#
+# This JDK matches in both the dev environment, and the container
+# Environment and should ganurtee 100% Java compatibility
+FROM apache/airflow:latest
+
+# Ideally, the host and container UID match allowing host access to container resources
 ARG UID=1000
-RUN addgroup -S appgroup && adduser -S appuser -u $UID -G appgroup
 
-FROM apache/airflow:latest AS sss-airflow-java
-COPY --from=sss-base-java /usr/lib/jvm/java-11-amazon-corretto /usr/lib/jvm/java-11-amazon-corretto
-
-# Ensure JAVA_HOME is correctly set
-ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto
-ENV PATH=$PATH:$JAVA_HOME
+# Required:
+ENV HADOOP_CONF_DIR=not-used
+ENV YARN_CONF_DIR=not-used
 
 # Install the Airflow Spark provider.  This is needed for SparkSubmitOperator
 RUN pip install apache-airflow-providers-apache-spark
 
+# Install Java
 USER root
 RUN apt update && \
+    apt install -y wget && \
+    wget -O - https://apt.corretto.aws/corretto.key | gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | tee /etc/apt/sources.list.d/corretto.list && \
+    apt update && \
     apt upgrade -y && \
+    apt install -y java-11-amazon-corretto-jdk && \
     rm -rf /var/lib/apt/lists/*
 
+## The ENTRYPOINT directive is implicitly (requires 'command:' in compose.yaml
+## ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint"]
 # docker build --tag sss/airflow-2.10-java11 .
 
-## The ENTRYPOINT directive is implicitly:
-## ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint"]
-## because this is the ENTRYPOINT in apache/airflow:2.10.0
 
 
-
-# to run Airflow tasks as this user
-# USER myuser:mygroup
-
-## The ENTRYPOINT directive is implicitly:
-## ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint"]
-########## END OF STAGE AIRFLOW ##########
-#
-#
-########### STAGE POSTGRES ##########
-#FROM postgres:13-alpine as sss-postgres
-## While duplicated, we need the t
-#ARG UID=1000
-#ARG GID=1000
-#RUN addgroup -g $GID mygroup && \
-#    adduser -u $UID -G mygroup -D myuser
-########### ENH OF STAGE POSTGRE ##########
-#
-#FROM portainer/portainer-ce:2.21.0 AS sss-portainer
-#ARG UID=1000
-#ARG GID=1000
-#RUN addgroup -g $GID mygroup && \
-#    adduser -u $UID -G mygroup -D myuser
-#
-#
-#
-#
-### sss-airflow-java
-##FROM apache/airflow:2.10.0 AS sss-airflow-java
-##COPY --from=sss-base-java /usr/lib/jvm/java-11-amazon-corretto /usr/lib/jvm/java-11-amazon-corretto
-##ENV JAVA_HOME=/usr/lib/jvm/java-11-amazon-corretto/bin
-##ENV PATH=$PATH:$JAVA_HOME
-##RUN pip install apache-airflow-providers-apache-spark
-##
-### The ENTRYPOINT directive is implicitly:
-### ENTRYPOINT ["/usr/bin/dumb-init", "--", "/entrypoint"]
-### because this is the ENTRYPOINT in apache/airflow:2.10.0
