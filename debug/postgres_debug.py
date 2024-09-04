@@ -3,7 +3,7 @@ import psycopg2
 # Connection parameters
 db_host = "postgres"
 db_port = "5432"
-db_name = "stocks"
+db_name = "airflow"
 db_user = "airflow"
 db_password = "airflow"
 
