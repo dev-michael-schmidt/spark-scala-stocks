@@ -2,8 +2,8 @@ FROM spark:3.5.2-scala2.12-java11-python3-ubuntu
 LABEL authors="mike"
 
 ENV APP_NAME=local
-ENV P1=1719842400
-ENV P2=1722520800
+ENV P1=915170400
+ENV P2=1704088800
 ENV INTERVAL=1d
 ENV SYMBOL=SPY
 ENV EVENTS=history
@@ -15,6 +15,8 @@ ENV PRICES=prices
 ENV DB_SAVE_MODE=overwrite
 ENV DB_DRIVER=org.postgresql.Driver
 ENV AIRFLOW_UID=1000
+
+# TODO: Okay for dev, use secrets in prod
 ENV AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@sss-postgres/airflow
 
 ENV HADOOP_CONF_DIR=required-not-used
