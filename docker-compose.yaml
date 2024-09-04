@@ -82,7 +82,7 @@ x-airflow-common:
 
     # REDIS_URL: redis://sss-redis:6379/0
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/src/main/python/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
@@ -124,7 +124,7 @@ services:
       - ".env"
     environment: # these will override the env_file env-vars
       - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_PASSWORD=airflow # TODO: Okay for dev, Use secretes in prod
       - POSTGRES_DB=airflow
     ports:
       - "5432:5432"
