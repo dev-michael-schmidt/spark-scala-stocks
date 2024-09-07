@@ -7,5 +7,5 @@ CREATE TABLE prices (
     low DOUBLE PRECISION,
     close DOUBLE PRECISION,
     adj_close DOUBLE PRECISION,
-    volume INT  -- See TODO` on spark DataFrame schema.  Currently DoubleType
+    volume INT  -- See TODO` on spark DataFrame schema.  Here Int, There DoubleType
 );
