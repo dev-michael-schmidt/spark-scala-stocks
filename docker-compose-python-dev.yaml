@@ -5,7 +5,7 @@ services:
     image: sss-python-dev:latest
     build:
       context: ..
-      dockerfile: Dockerfile-sss-python-dev
+      dockerfile: Dockerfile.symbol.java.airflow.template-sss-python-dev
     env_file:
       - "../.env"
     environment:      # This section overrides the .env file declarations
