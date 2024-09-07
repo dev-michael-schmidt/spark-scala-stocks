@@ -5,7 +5,7 @@ db_host = "postgres"
 db_port = "5432"
 db_name = "airflow"
 db_user = "airflow"
-db_password = "airflow"
+db_password = "airflow" # TODO: Okay for dev, use Secrets in prod
 
 connection = psycopg2.connect(
     host=db_host,
