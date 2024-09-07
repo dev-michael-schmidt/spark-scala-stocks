@@ -11,29 +11,31 @@ import scala.math.BigDecimal.RoundingMode
 
 object EndpointDataLoader {
 
+  // TODO: Robust logging
   private val spark = SparkSessionProvider.getSparkSession
 
-  private val period1 = 915170400 // System.getenv("P1")
-  private val period2 = 1704088800 // System.getenv("P2")
+  /* API */
+  private val period1 = System.getenv("P1")
+  private val period2 = System.getenv("P2")
   private val interval = System.getenv("INTERVAL")
   private val symbol = System.getenv("SYMBOL")
   private val events = System.getenv("EVENTS")
-
-  private val driver = System.getenv("DB_DRIVER")
-  private val user = System.getenv("POSTGRES_USER")
-  private val password = System.getenv("POSTGRES_PASS")
-
-  // TODO: Okay for dev, use Secrets manager in prod
-  private val password = "airflow" // System.getenv("POSTGRES_PASSWORD") // don't use env's in prod either
-
-  private val database = System.getenv("POSTGRES_DB")
-  private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
   private val schema = Common.yahooAPISchema
 
-  // TODO: use a env-var for postgres host
-  private val url = s"jdbc:postgresql://sss-postgres:5432/$database"
+  /* Postgres */
+  private val p_host = System.getenv("POSTGRES_HOST")
+  private val p_port = System.getenv("POSTGRES_PORT")
+  private val user = System.getenv("POSTGRES_USER")
+  private val password = System.getenv("POSTGRES_PASSWORD") // TODO: WARNING - Unacceptable, Use a secrets manager
+  private val mode = System.getenv("DB_SAVE_MODE")   // ! currently overwrite
+  private val driver = System.getenv("DB_DRIVER")
+  private val database = System.getenv("POSTGRES_DB")
+
+  private val url = s"jdbc:postgresql://${p_host}:${p_port}/${database}"
+
 
   def fromAPI(): DataFrame = {
+    /* "extract" */
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
     .uri(URI.create(s"${Common.YAHOO_FINANCE_ENDPOINT}" +
@@ -46,17 +48,18 @@ object EndpointDataLoader {
     )
     .GET() // request type
     .build()
+
+    /* "extract" */
     val response = client.send(request, BodyHandlers.ofString)
     val splitIntoLines = response.body.split('\n')
     val rowElements = splitIntoLines.map(row => row.split(','))
     val rowData = rowElements.tail.map { rows =>
       val date = rows.head // The Date column
       val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
-      Row.fromSeq(date +: values)
+      Row.fromSeq(date +: values) // date += prices
     }
-    // TODO: logging
-    println(s"######################## Got return code: ${response.statusCode()}")
 
+    /* transform */
     val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
       .withColumn("symbol", lit(symbol))
       .withColumnRenamed("Open", "open")
@@ -68,16 +71,11 @@ object EndpointDataLoader {
       .withColumn("event_ts", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
       .drop("Date")
 
-    println("########################  We've made the dataFrame")
-
     dataFrame
   }
   //noinspection AccessorLikeMethodIsUnit
   def toDatabase(dataFrame: DataFrame, table: String): Unit = {
-
-    dataFrame.show(3)
-
-    println("########################  Attempting to write")
+    /* load */
     dataFrame.write
     .format("jdbc")
     .option("url", url)
@@ -87,10 +85,9 @@ object EndpointDataLoader {
     .option("driver", driver)
     .mode(mode)
     .save()
-
-    println("@@@@@@@@@@@@@@@@@@@@ Write COMPLETED @@@@@@@@@@@@@@@@@@@@")
   }
 
+  /* defined, but not used */
   def fromDatabase(table: String): DataFrame = {
 
     val dataFrame = spark.read
@@ -98,7 +95,7 @@ object EndpointDataLoader {
       .option("driver", driver)
       .option("url", url)
       .option("user", user)
-      .option("password", "airflow") // in local, dev environment, this is not a concern TODO: secret's manager
+      .option("password", password) // TODO: unacceptable secret's manager
       .option("dbtable", table)
       .load()
 
