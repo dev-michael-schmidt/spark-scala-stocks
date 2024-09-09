@@ -13,18 +13,20 @@ object EndpointDataLoader {
 
   private val spark = SparkSessionProvider.getSparkSession
 
-  private val period1 = 915170400 // System.getenv("P1")
-  private val period2 = 1704088800 // System.getenv("P2")
+  /* API */
+  private val period1 = System.getenv("P1")
+  private val period2 = System.getenv("P2")
   private val interval = System.getenv("INTERVAL")
   private val symbol = System.getenv("SYMBOL")
   private val events = System.getenv("EVENTS")
 
-  private val driver = System.getenv("DB_DRIVER")
+  /* Postgres */
+  private val p_host = System.getenv("POSTGRES_HOST")
+  private val p_port = System.getenv("POSTGRES_PORT")
   private val user = System.getenv("POSTGRES_USER")
   private val password = "airflow" // System.getenv("POSTGRES_PASSWORD") // don't use env's in prod either
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
-  private val schema = Common.yahooAPISchema
 
   def makeV7Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
     s"https://query1.finance.yahoo.com/v7/finance/download/" +
@@ -44,7 +46,7 @@ object EndpointDataLoader {
       s"events=${events}"
   }
 
-  private val dbUrl = s"jdbc:postgresql://sss-postgres:5432/$database"
+  private val dbUrl = s"jdbc:postgresql://${p_host}/${p_port}$database"
   private val financeUrl = makeV8Url(symbol = symbol,
     period1 = period1,
     period2 = period2,
@@ -55,6 +57,8 @@ object EndpointDataLoader {
 
   println(s"make v8 ${makeV8Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
   println(s"make v7 ${makeV7Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
+  private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/${database}"
+
 
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
@@ -108,6 +112,7 @@ object EndpointDataLoader {
     println("@@@@@@@@@@@@@@@@@@@@ Write COMPLETED @@@@@@@@@@@@@@@@@@@@")
   }
 
+  /* defined, but not used */
   def fromDatabase(table: String): DataFrame = {
 
     val dataFrame = spark.read
@@ -115,7 +120,7 @@ object EndpointDataLoader {
       .option("driver", driver)
       .option("url", dbUrl)
       .option("user", user)
-      .option("password", "airflow") // in local, dev environment, this is not a concern TODO: secret's manager
+      .option("password", password) // TODO: unacceptable secret's manager
       .option("dbtable", table)
       .load()
 
