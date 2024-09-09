@@ -63,7 +63,7 @@
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
           <appendAssemblyId>false</appendAssemblyId>
-           <outputDirectory>dags/jars</outputDirectory>
+           <outputDirectory>jars</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -176,5 +176,27 @@
     <!--    	<artifactId>spark-mllib_2.11</artifactId>-->
     <!--    	<version>2.3.0</version>-->
     <!--    </dependency>-->
+
+    <!-- Circe Core for basic JSON handling -->
+    <dependency>
+        <groupId>io.circe</groupId>
+        <artifactId>circe-core_2.12</artifactId>
+        <version>0.14.10</version>
+    </dependency>
+
+    <!-- Circe Generic for automatic derivation of encoders/decoders -->
+    <dependency>
+        <groupId>io.circe</groupId>
+        <artifactId>circe-generic_2.12</artifactId>
+        <version>0.14.10</version>
+    </dependency>
+
+    <!-- Circe Parser for parsing JSON strings -->
+    <dependency>
+        <groupId>io.circe</groupId>
+        <artifactId>circe-parser_2.12</artifactId>
+        <version>0.14.10</version>
+    </dependency>
+
   </dependencies>
 </project>
