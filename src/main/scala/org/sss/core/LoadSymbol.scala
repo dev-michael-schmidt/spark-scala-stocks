@@ -4,7 +4,7 @@ import org.sss.core.EndpointDataLoader.{fromAPI, toDatabase}
 
 object LoadSymbol {
 
-  private val table = System.getenv("PRICES")
+  private val table = System.getenv("TABLE")
 
   def main(args: Array[String]): Unit = {
 
