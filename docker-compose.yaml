@@ -86,6 +86,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/jars:/opt/airflow/jars
 #  user: "${AIRFLOW_UID:-50000}:0"
   # This probably needs to get changed to the localhost UID to prevent heartache
   depends_on:
