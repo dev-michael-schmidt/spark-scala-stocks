@@ -21,31 +21,48 @@ object EndpointDataLoader {
 
   private val driver = System.getenv("DB_DRIVER")
   private val user = System.getenv("POSTGRES_USER")
-  private val password = System.getenv("POSTGRES_PASS")
-
-  // TODO: Okay for dev, use Secrets manager in prod
   private val password = "airflow" // System.getenv("POSTGRES_PASSWORD") // don't use env's in prod either
-
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
   private val schema = Common.yahooAPISchema
 
-  // TODO: use a env-var for postgres host
-  private val url = s"jdbc:postgresql://sss-postgres:5432/$database"
+  def makeV7Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
+    s"https://query1.finance.yahoo.com/v7/finance/download/" +
+      s"${symbol}?" +
+      s"period1=${period1}&" +
+      s"period2=${period2}&" +
+      s"interval=${interval}&" +
+      s"events=${events}"
+  }
+
+  def makeV8Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
+    s"https://query2.finance.yahoo.com/v8/finance/chart/" +
+      s"${symbol}?" +
+      s"period1=${period1}&" +
+      s"period2=${period2}&" +
+      s"interval=${interval}&" +
+      s"events=${events}"
+  }
+
+  private val dbUrl = s"jdbc:postgresql://sss-postgres:5432/$database"
+  private val financeUrl = makeV8Url(symbol = symbol,
+    period1 = period1,
+    period2 = period2,
+    interval = interval,
+    events = events)
+
+  // val url = makeV8Url(symbol, period1, period2, interval, events)
+
+  println(s"make v8 ${makeV8Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
+  println(s"make v7 ${makeV7Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
 
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
-    .uri(URI.create(s"${Common.YAHOO_FINANCE_ENDPOINT}" +
-      s"$symbol?" +
-      s"period1=$period1&" +
-      s"period2=$period2&" +
-      s"interval=$interval&" +
-      s"events=$events"
-      )
-    )
+    .uri(URI.create(financeUrl))
     .GET() // request type
     .build()
+
     val response = client.send(request, BodyHandlers.ofString)
     val splitIntoLines = response.body.split('\n')
     val rowElements = splitIntoLines.map(row => row.split(','))
@@ -80,7 +97,7 @@ object EndpointDataLoader {
     println("########################  Attempting to write")
     dataFrame.write
     .format("jdbc")
-    .option("url", url)
+    .option("url", dbUrl)
     .option("dbtable", table)
     .option("user", user)
     .option("password", password)
@@ -96,7 +113,7 @@ object EndpointDataLoader {
     val dataFrame = spark.read
       .format("jdbc")
       .option("driver", driver)
-      .option("url", url)
+      .option("url", dbUrl)
       .option("user", user)
       .option("password", "airflow") // in local, dev environment, this is not a concern TODO: secret's manager
       .option("dbtable", table)
