@@ -14,8 +14,8 @@ object EndpointDataLoader {
   private val spark = SparkSessionProvider.getSparkSession
 
   /* API */
-  private val period1 = System.getenv("P1")
-  private val period2 = System.getenv("P2")
+  private val period1 = System.getenv("P1").toInt
+  private val period2 = System.getenv("P2").toInt
   private val interval = System.getenv("INTERVAL")
   private val symbol = System.getenv("SYMBOL")
   private val events = System.getenv("EVENTS")
@@ -25,9 +25,12 @@ object EndpointDataLoader {
   private val p_port = System.getenv("POSTGRES_PORT")
   private val user = System.getenv("POSTGRES_USER")
   private val password = "airflow" // System.getenv("POSTGRES_PASSWORD") // don't use env's in prod either
+  private val driver = System.getenv("DB_DRIVER")
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
 
+  // TODO: move the URL methods into it's own Object
+  // TODO: case class for JSON Schema
   def makeV7Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
     s"https://query1.finance.yahoo.com/v7/finance/download/" +
       s"${symbol}?" +
@@ -53,12 +56,12 @@ object EndpointDataLoader {
     interval = interval,
     events = events)
 
+  private val schema = Common.yahooAPISchema
+
   // val url = makeV8Url(symbol, period1, period2, interval, events)
 
   println(s"make v8 ${makeV8Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
   println(s"make v7 ${makeV7Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
-  private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/${database}"
-
 
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
