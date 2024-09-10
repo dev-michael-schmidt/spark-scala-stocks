@@ -177,25 +177,25 @@
     <!--    	<version>2.3.0</version>-->
     <!--    </dependency>-->
 
-    <!-- Circe Core for basic JSON handling -->
+    <!-- Dependency for Json4s core functionalities -->
     <dependency>
-        <groupId>io.circe</groupId>
-        <artifactId>circe-core_2.12</artifactId>
-        <version>0.14.10</version>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-core_2.12</artifactId>
+        <version>3.7.0-M5</version>
     </dependency>
 
-    <!-- Circe Generic for automatic derivation of encoders/decoders -->
+    <!-- Dependency for Json4s native support -->
     <dependency>
-        <groupId>io.circe</groupId>
-        <artifactId>circe-generic_2.12</artifactId>
-        <version>0.14.10</version>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-native_2.12</artifactId>
+        <version>3.7.0-M5</version>
     </dependency>
 
-    <!-- Circe Parser for parsing JSON strings -->
+    <!-- Dependency for Json4s support with Jackson -->
     <dependency>
-        <groupId>io.circe</groupId>
-        <artifactId>circe-parser_2.12</artifactId>
-        <version>0.14.10</version>
+        <groupId>org.json4s</groupId>
+        <artifactId>json4s-jackson_2.12</artifactId>
+        <version>3.7.0-M5</version>
     </dependency>
 
   </dependencies>
