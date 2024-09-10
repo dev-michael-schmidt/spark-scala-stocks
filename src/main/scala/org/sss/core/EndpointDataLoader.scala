@@ -84,3 +84,36 @@ object EndpointDataLoader {
 
     dataFrame
   }
+
+  //noinspection AccessorLikeMethodIsUnit
+  def toDatabase(dataFrame: DataFrame, table: String): Unit = {
+
+    println("########################  Attempting to write")
+    dataFrame.write
+    .format("jdbc")
+    .option("url", dbUrl)
+    .option("dbtable", table)
+    .option("user", user)
+    .option("password", password)
+    .option("driver", driver)
+    .mode(mode)
+    .save()
+
+    println("@@@@@@@@@@@@@@@@@@@@ Write COMPLETED @@@@@@@@@@@@@@@@@@@@")
+  }
+
+  /* defined, but not used */
+  def fromDatabase(table: String): DataFrame = {
+
+    val dataFrame = spark.read
+      .format("jdbc")
+      .option("driver", driver)
+      .option("url", dbUrl)
+      .option("user", user)
+      .option("password", password) // TODO: unacceptable secret's manager
+      .option("dbtable", table)
+      .load()
+
+    dataFrame
+  }
+}
