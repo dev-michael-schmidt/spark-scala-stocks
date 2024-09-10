@@ -48,14 +48,15 @@ object DataMappings extends App {
   case class AdjustedClose(adjclose: List[Double])
   case class Result(meta: Meta, timestamp: List[Long], indicators: Indicators)
 
-  val yahooAPISchema: StructType = StructType(Array(
-    StructField("timestamp", LongType, nullable = true),
+  def getYahooAPISchema: StructType = { StructType(Array(
+    StructField("tstamp", LongType, nullable = true),
     StructField("high", DoubleType, nullable = true),
     StructField("low", DoubleType, nullable = true),
     StructField("open", DoubleType, nullable = true),
     StructField("close", DoubleType, nullable = true),
     // StructField("adjclose", DoubleType, nullable = true),
     StructField("volume", LongType, nullable = true)))
+  }
 
   private def urlParameters(sym: String, p1: Long, p2: Long, ivl: String, e: String ): String = {
     s"${sym}?period1=${p1}&period2=${p2}&interval=${ivl}&events=${e}"
