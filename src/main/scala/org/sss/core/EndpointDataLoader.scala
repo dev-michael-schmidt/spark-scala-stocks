@@ -1,17 +1,19 @@
 package org.sss.core
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
+import org.json4s.native.JsonMethods._
+import org.json4s.{DefaultFormats, _}
 
 import java.net.URI
 import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
-import scala.math.BigDecimal.RoundingMode
+
 
 object EndpointDataLoader {
 
   private val spark = SparkSessionProvider.getSparkSession
+  implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
 
   /* API */
   private val period1 = System.getenv("P1").toInt
@@ -28,74 +30,61 @@ object EndpointDataLoader {
   private val driver = System.getenv("DB_DRIVER")
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
-
-  // TODO: move the URL methods into it's own Object
-  // TODO: case class for JSON Schema
-  def makeV7Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
-    s"https://query1.finance.yahoo.com/v7/finance/download/" +
-      s"${symbol}?" +
-      s"period1=${period1}&" +
-      s"period2=${period2}&" +
-      s"interval=${interval}&" +
-      s"events=${events}"
-  }
-
-  def makeV8Url(symbol: String, period1: Int, period2: Int, interval: String, events: String): String = {
-    s"https://query2.finance.yahoo.com/v8/finance/chart/" +
-      s"${symbol}?" +
-      s"period1=${period1}&" +
-      s"period2=${period2}&" +
-      s"interval=${interval}&" +
-      s"events=${events}"
-  }
+  private val schema = DataMappings.yahooAPISchema // Likely to be null ???
 
   private val dbUrl = s"jdbc:postgresql://${p_host}/${p_port}$database"
-  private val financeUrl = makeV8Url(symbol = symbol,
+  private val financeUrl = DataMappings.makeV8Url(symbol = symbol,
     period1 = period1,
     period2 = period2,
     interval = interval,
     events = events)
 
-  private val schema = Common.yahooAPISchema
-
-  // val url = makeV8Url(symbol, period1, period2, interval, events)
-
-  println(s"make v8 ${makeV8Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
-  println(s"make v7 ${makeV7Url(symbol = symbol, period1=period1, period2 = period2, events = events, interval = interval)}")
-
   def fromAPI(): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
-    .uri(URI.create(financeUrl))
-    .GET() // request type
-    .build()
+      .uri(URI.create(financeUrl))
+      .GET() // request type
+      .build()
 
     val response = client.send(request, BodyHandlers.ofString)
-    val splitIntoLines = response.body.split('\n')
-    val rowElements = splitIntoLines.map(row => row.split(','))
-    val rowData = rowElements.tail.map { rows =>
-      val date = rows.head // The Date column
-      val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
-      Row.fromSeq(date +: values)
+    val json = parse(response.body())
+
+    val chart = (json \ "chart").asInstanceOf[JObject]
+    val results = (chart \ "result").asInstanceOf[JArray]
+    val quotes = for {
+      JObject(resultItem) <- results.arr
+      JField("indicators", JObject(indicators)) <- resultItem
+      JField("timestamp", JArray(timestamp)) <- resultItem
+      JField("quote", JArray(quoteItems)) <- indicators
+    } yield {
+      quoteItems.map { quote =>
+        val high = (quote \ "high").extract[List[Double]]
+        val low = (quote \ "low").extract[List[Double]]
+        val open = (quote \ "open").extract[List[Double]]
+        val close = (quote \ "close").extract[List[Double]]
+        val volume = (quote \ "volume").extract[List[Long]]
+        (timestamp.map(_.extract[Long]), high, low, open, close, volume)
+      }
     }
-    // TODO: logging
-    println(s"######################## Got return code: ${response.statusCode()}")
 
-    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
+    // The data must be explicitly flattened before it is mapped
+    val flatData = quotes.flatten.map {
+      case (timestamp, highs, lows, opens, closes, volumes) =>
+        timestamp.zipWithIndex.map { case (time, idx) =>
+          Row(time, highs(idx), lows(idx), opens(idx), closes(idx), volumes(idx))
+        }
+    }
+
+    // While it appears hacky, the nature of the JSON schema is deeply nested, so it must be flattened one more time
+    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(flatData.flatten), schema)
       .withColumn("symbol", lit(symbol))
-      .withColumnRenamed("Open", "open")
-      .withColumnRenamed("High", "high")
-      .withColumnRenamed("Low", "low")
-      .withColumnRenamed("Close", "close")
-      .withColumnRenamed("Adj Close", "adj_close")
-      .withColumnRenamed("Volume", "volume")
-      .withColumn("event_ts", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
-      .drop("Date")
 
+    // TODO: logging
     println("########################  We've made the dataFrame")
 
     dataFrame
   }
+
   //noinspection AccessorLikeMethodIsUnit
   def toDatabase(dataFrame: DataFrame, table: String): Unit = {
 
