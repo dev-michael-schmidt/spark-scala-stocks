@@ -1,4 +1,4 @@
-package org.sss.core
+/*package org.sss.core
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -31,7 +31,6 @@ object EndpointDataLoader {
   private val driver = System.getenv("DB_DRIVER")
   private val database = System.getenv("POSTGRES_DB")
   private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/${database}"
-
 
   def fromV7Api(): DataFrame = {
     /* "extract" */
@@ -100,3 +99,4 @@ object EndpointDataLoader {
     dataFrame
   }
 }
+*/
