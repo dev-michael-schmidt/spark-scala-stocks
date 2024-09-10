@@ -41,43 +41,6 @@ object EndpointDataLoader {
     interval = interval,
     events = events)
 
-  def fromV7Api(): DataFrame = {
-    // Todo: remove duplicated code
-    val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-    .uri(URI.create(DataMappings.makeV7Url(
-      symbol = symbol,
-      period1 = period1,
-      period2 = period2,
-      interval = interval,
-      events = events
-    ))
-    )
-    .GET() // request type
-    .build()
-
-    val response = client.send(request, BodyHandlers.ofString)
-    val splitIntoLines = response.body.split('\n')
-    val rowElements = splitIntoLines.map(row => row.split(','))
-    val rowData = rowElements.tail.map { rows =>
-      val date = rows.head // The Date column
-      val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
-      Row.fromSeq(date +: values) // date += prices
-    }
-
-    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
-      .withColumn("symbol", lit(symbol))
-      .withColumnRenamed("Open", "open")
-      .withColumnRenamed("High", "high")
-      .withColumnRenamed("Low", "low")
-      .withColumnRenamed("Close", "close")
-      .withColumnRenamed("Adj Close", "adj_close")
-      .withColumnRenamed("Volume", "volume")
-      .withColumn("tstamp", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
-      .drop("Date")
-
-    dataFrame
-
   def fromV8API(): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
@@ -123,6 +86,47 @@ object EndpointDataLoader {
 
     dataFrame
   }
+
+
+  def fromV7Api(): DataFrame = {
+    // Todo: remove duplicated code
+    val client = HttpClient.newHttpClient()
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create(DataMappings.makeV7Url(
+        symbol = symbol,
+        period1 = period1,
+        period2 = period2,
+        interval = interval,
+        events = events
+      ))
+      )
+      .GET() // request type
+      .build()
+
+    val response = client.send(request, BodyHandlers.ofString)
+    val splitIntoLines = response.body.split('\n')
+    val rowElements = splitIntoLines.map(row => row.split(','))
+    val rowData = rowElements.tail.map { rows =>
+      val date = rows.head // The Date column
+      val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
+      Row.fromSeq(date +: values) // date += prices
+    }
+
+    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
+      .withColumn("symbol", lit(symbol))
+      .withColumnRenamed("Open", "open")
+      .withColumnRenamed("High", "high")
+      .withColumnRenamed("Low", "low")
+      .withColumnRenamed("Close", "close")
+      .withColumnRenamed("Adj Close", "adj_close")
+      .withColumnRenamed("Volume", "volume")
+      .withColumn("tstamp", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
+      .drop("Date")
+
+    dataFrame
+  }
+
+
 
   //noinspection AccessorLikeMethodIsUnit
   def toDatabase(dataFrame: DataFrame, table: String): Unit = {
