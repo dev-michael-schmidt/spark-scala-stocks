@@ -30,16 +30,16 @@ object EndpointDataLoader {
   private val driver = System.getenv("DB_DRIVER")
   private val database = System.getenv("POSTGRES_DB")
   private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
-  private val schema = DataMappings.yahooAPISchema // Likely to be null ???
-
   private val dbUrl = s"jdbc:postgresql://${p_host}/${p_port}$database"
+
+  private val schema = DataMappings.getYahooAPISchema
   private val financeUrl = DataMappings.makeV8Url(symbol = symbol,
     period1 = period1,
     period2 = period2,
     interval = interval,
     events = events)
 
-  def fromAPI(): DataFrame = {
+  def fromV8API(): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
       .uri(URI.create(financeUrl))
@@ -77,45 +77,10 @@ object EndpointDataLoader {
 
     // While it appears hacky, the nature of the JSON schema is deeply nested, so it must be flattened one more time
     val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(flatData.flatten), schema)
-      .withColumn("symbol", lit(symbol))
 
     // TODO: logging
     println("########################  We've made the dataFrame")
+    dataFrame.show(1)
 
     dataFrame
   }
-
-  //noinspection AccessorLikeMethodIsUnit
-  def toDatabase(dataFrame: DataFrame, table: String): Unit = {
-
-    dataFrame.show(3)
-
-    println("########################  Attempting to write")
-    dataFrame.write
-    .format("jdbc")
-    .option("url", dbUrl)
-    .option("dbtable", table)
-    .option("user", user)
-    .option("password", password)
-    .option("driver", driver)
-    .mode(mode)
-    .save()
-
-    println("@@@@@@@@@@@@@@@@@@@@ Write COMPLETED @@@@@@@@@@@@@@@@@@@@")
-  }
-
-  /* defined, but not used */
-  def fromDatabase(table: String): DataFrame = {
-
-    val dataFrame = spark.read
-      .format("jdbc")
-      .option("driver", driver)
-      .option("url", dbUrl)
-      .option("user", user)
-      .option("password", password) // TODO: unacceptable secret's manager
-      .option("dbtable", table)
-      .load()
-
-    dataFrame
-  }
-}
