@@ -341,7 +341,8 @@ services:
     depends_on:
       - sss-postgres
     volumes:
-      - ./data/grafana_data:/var/lib/grafana
+      - ./data/grafana_data/plugins:/var/lib/grafana/plugins
+
 
 volumes:
   postgres_data:
