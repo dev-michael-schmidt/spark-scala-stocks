@@ -19,8 +19,7 @@ object EndpointDataLoader {
 
   /* API */
   private val period1 = System.getenv("P1").toLong
-  private val period2: Long = System.currentTimeMillis / 1000
-  // System.getenv("P2").toInt
+  private val period2: Long = System.getenv("P2").toInt // System.currentTimeMillis / 1000
   private val interval = System.getenv("INTERVAL")
   private val symbol = System.getenv("SYMBOL")
   private val events = System.getenv("EVENTS")

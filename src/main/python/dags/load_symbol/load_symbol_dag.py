@@ -6,8 +6,8 @@ from airflow.providers.docker.operators.docker import DockerOperator
 
 env_vars = {
     'APP_NAME': 'SparkScalaStocks',
-    'P1': "1719842400",
-    'P2': "1722520800",
+    'P1': "908427600",
+    'P2': "1728968400",
     'INTERVAL': '1d',
     'SYMBOL': 'SPY',
     'EVENTS': 'history',
@@ -21,7 +21,7 @@ env_vars = {
     'YARN_CONF_DIR': 'not-used',
 }
 
-with DAG(dag_id="load_symbol",
+with DAG(dag_id="spark_submit_load_symbol",
          start_date=datetime(2024, 6, 1),
          schedule_interval="@hourly",
          catchup=False) as dag:
