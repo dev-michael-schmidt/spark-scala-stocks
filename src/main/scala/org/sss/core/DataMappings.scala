@@ -80,6 +80,7 @@ object DataMappings extends App {
 
   def validateTimescales(period1: Long, period2: Long, interval: String): Boolean = {
 
+    // WIP
     if (period1 <= 0 || period2 <= 0) {
       false
     }
@@ -91,7 +92,7 @@ object DataMappings extends App {
   }
 
     /*
-    minutes
+    intra-day
     1m - only 7 days worth
     2m - the requested range must be within the last 60 days
     5m - the requested range must be within the last 60 days
@@ -100,18 +101,15 @@ object DataMappings extends App {
     90m - the requested range must be within the last 60 days
     1h - within the last 730 days
 
+    days
     1d - No known limit
     5d - No known limit
-
     1wk - No known limit
 
+    extended
     1mo - No known limit
     3mo - No known limit
-
-
-
      */
-  }
 }
 
 
