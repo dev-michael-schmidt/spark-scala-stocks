@@ -1,4 +1,6 @@
-What: An ETL that
+
+
+What? An ETL that:
 - loads 20+ years of stock price data from the S&P 500
 - performs quantitative analysis (currently, parameterized SMA, EMA
 - visualizes the results.
