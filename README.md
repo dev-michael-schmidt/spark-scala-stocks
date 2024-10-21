@@ -1,1 +1,1 @@
- An ETL that loads 20+ years of stock price data for the top stocks, perform some quantitative analysis, and visualize the results. It uses Spark, Airflow, Grafana, Python, and Scala. That could be cool, right? 
+What: An ETL that loads 20+ years of stock price data for the top stocks, performs some quantitative analysis, and visualizes the results. It uses Spark, Airflow, Grafana, Python, and Scala. That could be cool, right? 
