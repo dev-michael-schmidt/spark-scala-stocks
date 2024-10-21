@@ -23,12 +23,12 @@ env_vars = {
 
 with DAG(dag_id="spark_submit_load_symbol",
          start_date=datetime(2024, 6, 1),
-         schedule_interval="@hourly",
+         schedule_interval="@daily",
          catchup=False) as dag:
-    load_spark_submit_spy = SparkSubmitOperator(task_id="spark_submit_spy",
-                                                application='/opt/airflow/jars/load_symbol/spark-scala-stocks-1.0.jar',
-                                                env_vars=env_vars,
-                                                )
+    spark_submit_load_symbol = SparkSubmitOperator(task_id="spark_submit_spy",
+                                                   application='/opt/airflow/jars/load_symbol/spark-scala-stocks-1.0.jar',
+                                                   env_vars=env_vars,
+                                                   )
 
     # docker build -t sss-ls-1.0 .
     # load_docker_spy = DockerOperator(task_id='docker_load_spy',
@@ -39,4 +39,4 @@ with DAG(dag_id="spark_submit_load_symbol",
     #                              network_mode='container:spark-scala-stocks_default',
     #                              auto_remove='success')
 
-    load_spark_submit_spy #  >> load_docker_spy
+    spark_submit_load_symbol #  >> load_docker_spy
