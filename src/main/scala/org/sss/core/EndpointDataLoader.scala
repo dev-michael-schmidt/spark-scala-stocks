@@ -5,24 +5,42 @@ import org.apache.spark.sql.types.{LongType, MetadataBuilder}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.json4s.native.JsonMethods._
 import org.json4s.{DefaultFormats, _}
+import org.sss.core.EndpointDataLoader.{createUrl, fetchDataFromUrl, toDatabase}
 
 import java.net.URI
 import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
 import scala.math.BigDecimal.RoundingMode
 
+case class EndpointDataLoader(symbol: String,
+                              period1: Long,
+                              period2: Long,
+                              interval: String,
+                              version: String = "v8",
+                              events: String = "history",
+                              table: Option[String] = None) {
+
+  def getSymbol(symbol: String,
+                period1: Long,
+                period2: Long,
+                interval: String,
+                version: String = "v8",
+                events: String = "history"): DataFrame = {
+
+    val financeURL: String = createUrl(version, symbol, period1, period2, interval, events)
+    val result: DataFrame = fetchDataFromUrl(financeURL)
+    result
+  }
+
+  def loadSymbol(table: String) = {
+    this.copy(table = Some(table))
+  }
+}
 
 object EndpointDataLoader {
 
   private val spark = SparkSessionProvider.getSparkSession
   implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
-
-  /* API */
-  private val period1 = System.getenv("P1").toLong
-  private val period2: Long = System.getenv("P2").toInt // System.currentTimeMillis / 1000
-  private val interval = System.getenv("INTERVAL")
-  private val symbol = System.getenv("SYMBOL")
-  private val events = System.getenv("EVENTS")
 
   /* Postgres */
   private val p_host = "localhost" //System.getenv("POSTGRES_HOST")
@@ -35,14 +53,38 @@ object EndpointDataLoader {
   private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/$database"
 
   private val schema = DataMappings.getYahooAPISchema
-  private val financeUrl = DataMappings.makeV8Url(symbol = symbol,
-    period1 = period1,
-    period2 = period2,
-    interval = interval,
-    events = events)
 
+  private def createUrl(version: String,
+                        symbol: String,
+                        period1: Long,
+                        period2: Long,
+                        interval: String,
+                        events: String): String = {
+    val url: String = version match {
+      case "v8" => DataMappings.makeV8Url(symbol, period1, period2, interval, events)
+      case "v7" => DataMappings.makeV7Url(symbol, period1, period2, interval, events)
+      case _    => throw new IllegalArgumentException(s"Unsupported API version: $version")
+    }
+    url
+  }
+
+  private def fetchDataFromUrl(url: String): DataFrame = {
+    val client = HttpClient.newHttpClient()
+    val request = HttpRequest.newBuilder()
+      .uri(URI.create(url))
+      .GET() // request type
+      .build()
+
+    // Send the request and get the response as a String
+    val responseBody: String = client.send(request, BodyHandlers.ofString).body()
+
+    val result = url match {
+      case u if url.contains("v7") => fromV7API(responseBody)
+      case u if url.contains("v8") => fromV8API(responseBody)
+    }
+    result
+  }
   private val roundPrecision = 4
-
   def roundAt(precision: Int)(n: Double): Double = { val s = math pow (10, precision); (math round n * s) / s }
 
   def flattenJson(json: JObject, prefix: String = ""): Map[String, Any] = {
@@ -71,15 +113,9 @@ object EndpointDataLoader {
     }.toMap
   }
 
-  def fromV8API(): DataFrame = {
-    val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-      .uri(URI.create(financeUrl))
-      .GET() // request type
-      .build()
+  def fromV8API(responseBody: String): DataFrame = {
 
-    val response = client.send(request, BodyHandlers.ofString)
-    val json = parse(response.body())
+    val json = parse(responseBody)
 
     val chart = (json \ "chart").asInstanceOf[JObject]
     val result = (chart \ "result").asInstanceOf[JArray]
@@ -127,23 +163,9 @@ object EndpointDataLoader {
     dataFrame
   }
 
-  def fromV7Api(): DataFrame = {
-    // Todo: remove duplicated code
-    val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-      .uri(URI.create(DataMappings.makeV7Url(
-        symbol = symbol,
-        period1 = period1,
-        period2 = period2,
-        interval = interval,
-        events = events
-      ))
-      )
-      .GET() // request type
-      .build()
+  def fromV7API (responseBody: String): DataFrame = {
 
-    val response = client.send(request, BodyHandlers.ofString)
-    val splitIntoLines = response.body.split('\n')
+    val splitIntoLines = responseBody.split('\n')
     val rowElements = splitIntoLines.map(row => row.split(','))
     val rowData = rowElements.tail.map { rows =>
       val date = rows.head // The Date column
