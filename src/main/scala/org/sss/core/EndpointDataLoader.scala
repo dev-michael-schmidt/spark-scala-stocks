@@ -83,11 +83,11 @@ object EndpointDataLoader {
 
     val chart = (json \ "chart").asInstanceOf[JObject]
     val result = (chart \ "result").asInstanceOf[JArray]
-    val metadataJObject = (result \ "meta")
-      .asInstanceOf[JArray]
-      .arr
-      .head
-      .asInstanceOf[JObject]
+    val metadataJObject = (result \ "meta") // JValue
+      .asInstanceOf[JArray]                 // JArray
+      .arr                                  // List[JsonAST.JValue]
+      .head                                 // JsonAST.JValue
+      .asInstanceOf[JObject]                // JObject
 
     val metaData = flattenJson(metadataJObject)
     val quotes = for {
@@ -166,7 +166,7 @@ object EndpointDataLoader {
   }
 
   //noinspection AccessorLikeMethodIsUnit
-  def toDatabase(dataFrame: DataFrame, table: String): Unit = {
+  def toDatabase(dataFrame: DataFrame, table: String, mode: String = "overwrite"): Unit = {
 
     dataFrame.write
       .format("jdbc")
