@@ -6,7 +6,32 @@ import org.apache.spark.sql.functions._
 import org.json4s.JsonAST.JArray
 import org.sss.core.EndpointDataLoader.{fromDatabase, toDatabase}
 
-case class DataTransforms(symbol: String, data: Option[org.apache.spark.sql.DataFrame] = None)
+case class DataTransforms(symbol: String, data: Option[DataFrame] = None) {
+
+
+  // Process the data using the companion object's methods
+  def process(): Unit = {
+    // If data is already provided, use it; otherwise, fetch it
+    val df = data.getOrElse(DataTransforms.fetchData(symbol)) // Fetch if not present
+    val completedDf = DataTransforms.fillMissing(df) // Apply transformation
+    DataTransforms.writeData(completedDf, symbol) // Write the transformed data back
+  }
+  /*
+  USAGE:
+  val transform = DataTransforms("AAPL")
+  transform.process() // This will fetch data for "AAPL"
+ */
+
+
+  def withData(df: DataFrame): DataTransforms = {
+    this.copy(data = Some(df)) // Return a new instance (of self) with the DataFrame attached
+  }
+  /*
+  val someData: DataFrame = spark.read. ...
+  val transformWithData = DataTransforms("AAPL").withData(someData)
+  transformWithData.process() // This will use the provided DataFrame instead of fetching
+  */
+}
 
 object DataTransforms {
 
@@ -74,12 +99,6 @@ object DataTransforms {
   def writeData(df: DataFrame, table: String, mode: String = "overwrite"): Unit = {
     toDatabase(df, table, mode)
   }
-
-  def process(table: String): Unit = {
-    val df = fetchData(table)
-    val completedDf = fillMissing(df)
-    writeData(completedDf, table)
-  }
 }
 
 
@@ -87,7 +106,6 @@ object DataTransforms {
 
 
 /*
-
   def fillMissing() = {
 
 
