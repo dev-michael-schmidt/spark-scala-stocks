@@ -86,6 +86,7 @@ object EndpointDataLoader {
     }
     result
   }
+
   private val roundPrecision = 4
   def roundAt(precision: Int)(n: Double): Double = { val s = math pow (10, precision); (math round n * s) / s }
 
