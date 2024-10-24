@@ -153,56 +153,57 @@ object EndpointDataLoader {
       }
     }
 
-    // The data must be explicitly flattened before it is mapped
-    val flatData = quotes.flatten.map {
-      case (timestamp, highs, lows, opens, closes, volumes) =>
-        timestamp.zipWithIndex.map { case (time, idx) =>
-          Row(time, highs(idx), lows(idx), opens(idx), closes(idx), volumes(idx))
-        }
+      // The data must be explicitly flattened before it is mapped
+      val flatData = quotes.flatten.map {
+        case (timestamp, highs, lows, opens, closes, volumes) =>
+          timestamp.zipWithIndex.map { case (time, idx) =>
+            Row(time, highs(idx), lows(idx), opens(idx), closes(idx), volumes(idx))
+          }
+      }
+
+      // While it appears hacky, the nature of the JSON schema is deeply nested, so it must be flattened one more time
+      val dataFrame: DataFrame = spark.createDataFrame(spark.sparkContext.parallelize(flatData.flatten), schema)
+        .withColumn("symbol", lit("symbol"))
+      dataFrame
     }
 
-    // While it appears hacky, the nature of the JSON schema is deeply nested, so it must be flattened one more time
-    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(flatData.flatten), schema)
-    dataFrame
-  }
+  def fromV7API(responseBody: String): DataFrame = {
 
-  def fromV7API (responseBody: String): DataFrame = {
+      val splitIntoLines = responseBody.split('\n')
+      val rowElements = splitIntoLines.map(row => row.split(','))
+      val rowData = rowElements.tail.map { rows =>
+        val date = rows.head // The Date column
+        val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
+        Row.fromSeq(date +: values) // date += prices
+      }
 
-    val splitIntoLines = responseBody.split('\n')
-    val rowElements = splitIntoLines.map(row => row.split(','))
-    val rowData = rowElements.tail.map { rows =>
-      val date = rows.head // The Date column
-      val values = rows.tail.map(BigDecimal(_).setScale(4, RoundingMode.HALF_UP).toDouble)
-      Row.fromSeq(date +: values) // date += prices
+      val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
+        .withColumn("symbol", lit("symbol"))
+        .withColumnRenamed("Open", "open")
+        .withColumnRenamed("High", "high")
+        .withColumnRenamed("Low", "low")
+        .withColumnRenamed("Close", "close")
+        .withColumnRenamed("Adj Close", "adj_close")
+        .withColumnRenamed("Volume", "volume")
+        .withColumn("tstamp", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
+        .drop("Date")
+
+      dataFrame
     }
-
-    val dataFrame = spark.createDataFrame(spark.sparkContext.parallelize(rowData), schema)
-      .withColumn("symbol", lit(symbol))
-      .withColumnRenamed("Open", "open")
-      .withColumnRenamed("High", "high")
-      .withColumnRenamed("Low", "low")
-      .withColumnRenamed("Close", "close")
-      .withColumnRenamed("Adj Close", "adj_close")
-      .withColumnRenamed("Volume", "volume")
-      .withColumn("tstamp", unix_timestamp(col("Date"), "yyyy-MM-dd").cast(LongType))
-      .drop("Date")
-
-    dataFrame
-  }
 
   //noinspection AccessorLikeMethodIsUnit
   def toDatabase(dataFrame: DataFrame, table: String, mode: String = "overwrite"): Unit = {
 
-    dataFrame.write
-      .format("jdbc")
-      .option("url", dbUrl)
-      .option("dbtable", table)
-      .option("user", user)
-      .option("password", password)
-      .option("driver", driver)
-      .mode(mode)
-      .save()
-  }
+      dataFrame.write
+        .format("jdbc")
+        .option("url", dbUrl)
+        .option("dbtable", table)
+        .option("user", user)
+        .option("password", password)
+        .option("driver", driver)
+        .mode(mode)
+        .save()
+    }
 
   /* defined, but not used */
   def fromDatabase(table: String): DataFrame = {
