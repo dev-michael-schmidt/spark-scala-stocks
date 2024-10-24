@@ -35,7 +35,7 @@ case class DataOperations(val tickerSymbol: String,
   }
 }
 
-object EndpointDataLoader {
+object DataOperations {
 
   /* Postgres */
   private val p_host = "localhost" //System.getenv("POSTGRES_HOST")
