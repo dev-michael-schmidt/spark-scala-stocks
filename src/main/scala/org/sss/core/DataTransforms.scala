@@ -59,6 +59,16 @@ class DataTransforms(val tickerSymbol: String,
   transformWithData.process() // This will use the provided DataFrame instead of fetching
   */
 
+//   TODO: Advance usage interpolate from table by periods 1 & 2
+//  def interpolate(table: String, period1: Long, period2: Long): DataFrame = {
+//    val df = fetchDataFromDatabase(table)
+//    val filledDataFrame = fillMissing(df)
+//    filledDataFrame
+//  }
+    // TODO: Advance usage interpolate from DataFrame by period 1 & 2
+//  def interpolate(data: DataFrame): DataFrame = {
+//    val filledDataFrame = fillMissing(data)
+//    filledDataFrame
 }
 
 object DataTransforms {
@@ -69,9 +79,7 @@ object DataTransforms {
   (case classes) are supported by importing spark.implicits._  Support for serializing other types will be added in
   future releases. An encoder is use when `.toDF is called to create a data completed DataFrame */
 
-  def fetchData(table: String): DataFrame = fromDatabase(table)
-
-  def fillMissing(df: DataFrame): DataFrame = {
+  def _interpolate(df: DataFrame): DataFrame = {
 
     val windowSpec = Window.orderBy("tstamp")
     val dataWithCurrPrev = df
@@ -123,54 +131,4 @@ object DataTransforms {
 
     completedDataFrame
   }
-
-  def writeData(df: DataFrame, table: String, mode: String = "overwrite"): Unit = {
-    toDatabase(df, table, mode)
-  }
 }
-
-
-
-
-
-/*
-  def fillMissing() = {
-
-
-  // Now, we can split the rows where the diff is greater than 86400
-
-  // Function to create new rows with interpolated values
-  private val completedDataframe = dataWithCurrPrev.flatMap(row => {
-    val tstamp = row.getAs[Long]("tstamp")
-    val prevTstamp = row.getAs[Long]("prev_tstamp")
-    val high = row.getAs[Double]("high")
-    val low = row.getAs[Double]("low")
-    val open = row.getAs[Double]("open")
-    val close = row.getAs[Double]("close")
-    val volume = row.getAs[Long]("volume")
-    val diff = row.getAs[Long]("diff")
-
-    // If the diff is greater than 86400 (1 day), split into two rows
-    if (diff > 86400) {
-      val interpolatedTstamp = prevTstamp + diff / 2
-      val interpolatedHigh = (high + row.getAs[Double]("high")) / 2
-      val interpolatedLow = (low + row.getAs[Double]("low")) / 2
-      val interpolatedOpen = (open + row.getAs[Double]("open")) / 2
-      val interpolatedClose = (close + row.getAs[Double]("close")) / 2
-
-      // Return both the interpolated row (with volume = 0) and the original row
-      Seq(
-        (interpolatedTstamp, interpolatedHigh, interpolatedLow, interpolatedOpen, interpolatedClose, 0L),  // Volume set to 0
-        (tstamp, high, low, open, close, volume) // Original row
-      )
-    } else {
-      // If no gap, return the original row
-      Seq((tstamp, high, low, open, close, volume))
-    }
-  }).toDF("tstamp", "high", "low", "open", "close", "volume")
-
-
-  toDatabase(completedDataFrame, "AMT_COMPLETE")
-  println("we've reached the end")
-}
-*/
