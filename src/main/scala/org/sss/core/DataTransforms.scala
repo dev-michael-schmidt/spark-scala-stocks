@@ -39,24 +39,17 @@ class DataTransforms(val tickerSymbol: String,
     new DataTransforms(tickerSymbol, period1, period2, interval, events, data)
   }
 
-  // def interpolate(table: String, p1: String, p2: String) = { }
-  // Advanced feature... interpolate within a time range!
-
-
-
-  // Process the data using the companion object's methods
-  def process(): Unit = {
-    // If data is already provided, use it; otherwise, fetch it
-    val df = data.getOrElse(DataTransforms.fetchData(sym)) // Fetch if not present
-    val completedDf = DataTransforms.fillMissing(df) // Apply transformation
-    DataTransforms.writeData(completedDf, sym) // Write the transformed data back
+  // Interpolate from table and return a new instance with filled data
+  def interpolate(table: String): DataTransforms = {
+    val df = fetchDataFromDatabase(table) // Assuming this method fetches data from the database
+    val filledDataFrame = _interpolate(df) // Assuming this method fills missing data
+    this.copy(data = Some(filledDataFrame)) // Return a new instance with the filled data
   }
 
-
-
-
-  def withData(df: DataFrame): DataTransforms = {
-    this.copy(data = Some(df)) // Return a new instance (of self) with the DataFrame attached
+  // Interpolate using the provided DataFrame and return a new instance with filled data
+  def interpolate(data: DataFrame): DataTransforms = {
+    val filledDataFrame = _interpolate(data) // Assuming this method fills missing data
+    this.copy(data = Some(filledDataFrame)) // Return a new instance with the filled data
   }
 
 //   TODO: Advance usage interpolate from table by periods 1 & 2
