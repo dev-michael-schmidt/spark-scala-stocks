@@ -12,7 +12,7 @@ import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
 import scala.math.BigDecimal.RoundingMode
 
-case class EndpointDataLoader(symbol: String,
+case class EndpointDataLoader(tickerSymbol: String,
                               period1: Long,
                               period2: Long,
                               interval: String,
