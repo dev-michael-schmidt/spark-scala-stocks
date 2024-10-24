@@ -34,8 +34,9 @@ case class EndpointDataLoader(tickerSymbol: String,
     result
   }
 
-  def loadSymbol(table: String) = {
-    this.copy(table = Some(table))
+  def loadSymbol(df: DataFrame, table: String): Unit = {
+    val df = copy(table = Some(table)).getSymbol
+    toDatabase(df, table)
   }
 
   def loadSymbol(ticketSymbol: String): Unit = {
