@@ -1,6 +1,5 @@
 package org.sss.core
 
-import org.sss.core.EndpointDataLoader._
 
 object LoadSymbol {
 
