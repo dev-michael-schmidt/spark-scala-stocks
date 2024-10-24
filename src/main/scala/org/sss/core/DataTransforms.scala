@@ -28,10 +28,14 @@ class DataTransforms(val tickerSymbol: String,
   val fromDataFrame = newTransformWithDataFrame.data
   */
 
-  def interpolate(table: String): Unit = {
-    val df = fetchData(table)
-    val completedData = DataTransforms.fillMissing(df)
-    completedData
+  // Method to copy the instance with new data
+  private def copy(tickerSymbol: String = this.tickerSymbol,
+                   period1: Long = this.period1,
+                   period2: Long = this.period2,
+                   interval: String = this.interval,
+                   events: String = this.events,
+                   data: Option[DataFrame] = this.data): DataTransforms = {
+    new DataTransforms(tickerSymbol, period1, period2, interval, events, data)
   }
 
   // def interpolate(table: String, p1: String, p2: String) = { }
