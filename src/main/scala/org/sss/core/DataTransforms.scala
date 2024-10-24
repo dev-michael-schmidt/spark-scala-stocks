@@ -3,10 +3,8 @@ package org.sss.core
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.json4s.JsonAST.JArray
-import org.sss.DataOperations
-import org.sss.core.DataTransforms.fetchData
-import org.sss.core.DataOperations.{fromDatabase, toDatabase}
+import org.sss.core.DataTransforms._interpolate
+
 
 class DataTransforms(val tickerSymbol: String,
                      val period1: Long,
