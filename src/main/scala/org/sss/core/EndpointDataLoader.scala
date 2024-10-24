@@ -54,7 +54,7 @@ object EndpointDataLoader {
   private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/$database"
 
   private val spark = SparkSessionProvider.getSparkSession
-  implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
+  implicit val formats: DefaultFormats.type = DefaultFormats // Required for extracting values (json4s)
 
  private val schema = DataMappings.getYahooAPISchema
 
