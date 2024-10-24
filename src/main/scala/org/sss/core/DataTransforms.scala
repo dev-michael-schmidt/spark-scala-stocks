@@ -4,23 +4,58 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.json4s.JsonAST.JArray
-import org.sss.core.EndpointDataLoader.{fromDatabase, toDatabase}
+import org.sss.DataOperations
+import org.sss.core.DataTransforms.fetchData
+import org.sss.core.DataOperations.{fromDatabase, toDatabase}
 
-case class DataTransforms(symbol: String, data: Option[DataFrame] = None) {
+class DataTransforms(val tickerSymbol: String,
+                     val period1: Long,
+                     val period2: Long,
+                     val interval: String,
+                     val events: String = "history"
+                     ) extends StockMeta {
+
+  // override val tickerSymbol: String = tickerSymbol
+//  override val period1: Long = period1
+//  override val period2: Long = period2
+//  override val interval: String = interval
+
+//  override def fetchData: DataFrame = {
+//    //val dataTransforms.
+//    "foo"
+//  }
+
+  def interpolate() = {
+    val df = data.getOrElse(fetchData(tickerSymbol))
+    val completedData = DataTransforms.fillMissing(df)
+    completedData
+  }
+
+  def interpolate(dataFrame: DataFrame): DataFrame = {
+    val completedData = DataTransforms.fillMissing(dataFrame)
+    completedData
+  }
+
+  def interpolate(table: String): Unit = {
+    val df = fetchData(table)
+    val completedData = DataTransforms.fillMissing(df)
+    completedData
+  }
+
+  // def interpolate(table: String, p1: String, p2: String) = { }
+  // Advanced feature... interpolate within a time range!
+
 
 
   // Process the data using the companion object's methods
   def process(): Unit = {
     // If data is already provided, use it; otherwise, fetch it
-    val df = data.getOrElse(DataTransforms.fetchData(symbol)) // Fetch if not present
+    val df = data.getOrElse(DataTransforms.fetchData(sym)) // Fetch if not present
     val completedDf = DataTransforms.fillMissing(df) // Apply transformation
-    DataTransforms.writeData(completedDf, symbol) // Write the transformed data back
+    DataTransforms.writeData(completedDf, sym) // Write the transformed data back
   }
-  /*
-  USAGE:
-  val transform = DataTransforms("AAPL")
-  transform.process() // This will fetch data for "AAPL"
- */
+
+
 
 
   def withData(df: DataFrame): DataTransforms = {
@@ -31,6 +66,7 @@ case class DataTransforms(symbol: String, data: Option[DataFrame] = None) {
   val transformWithData = DataTransforms("AAPL").withData(someData)
   transformWithData.process() // This will use the provided DataFrame instead of fetching
   */
+
 }
 
 object DataTransforms {
