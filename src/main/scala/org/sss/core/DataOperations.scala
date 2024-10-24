@@ -24,8 +24,8 @@ case class DataOperations(val tickerSymbol: String,
     result
   }
 
-  def loadSymbol(df: DataFrame, table: String): Unit = {
-    val df = copy(table = Some(table)).getSymbol
+  def pushData(df: DataFrame, table: String): Unit = {
+    val df = copy(table).fetchData
     toDatabase(df, table)
   }
 
