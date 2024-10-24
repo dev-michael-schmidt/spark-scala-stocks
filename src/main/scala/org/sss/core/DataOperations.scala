@@ -29,10 +29,9 @@ case class DataOperations(val tickerSymbol: String,
     toDatabase(df, table)
   }
 
-  def loadSymbol(ticketSymbol: String): Unit = {
-    val df = copy(table = table).getSymbol
+  def pushDatal(ticketSymbol: String): Unit = {
+    val df = copy(TABLE).fetchData
     toDatabase(df, ticketSymbol)
-
   }
 }
 
