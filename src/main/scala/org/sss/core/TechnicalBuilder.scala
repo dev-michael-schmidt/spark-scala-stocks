@@ -1,8 +1,8 @@
-package org.sss.technicals
+package org.sss.core
 
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession, functions => F}
 
 case class TechnicalBuilder(var df: DataFrame) {
 
