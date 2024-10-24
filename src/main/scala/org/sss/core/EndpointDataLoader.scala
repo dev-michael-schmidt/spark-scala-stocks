@@ -47,20 +47,23 @@ case class EndpointDataLoader(tickerSymbol: String,
 
 object EndpointDataLoader {
 
-  private val spark = SparkSessionProvider.getSparkSession
-  implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
-
   /* Postgres */
   private val p_host = "localhost" //System.getenv("POSTGRES_HOST")
   private val p_port = System.getenv("POSTGRES_PORT")
-  private val user = System.getenv("POSTGRES_USER")
+
+  val user: String = System.getenv("POSTGRES_USER")
   private val password = "airflow" // System.getenv("POSTGRES_PASSWORD") // don't use env's in prod either
+
+  val database: String = System.getenv("POSTGRES_DB")
+  val mode: String = System.getenv("DB_SAVE_MODE") // ! currently overwrite
+
   private val driver = System.getenv("DB_DRIVER")
-  private val database = System.getenv("POSTGRES_DB")
-  private val mode = System.getenv("DB_SAVE_MODE")   //! currently overwrite
   private val dbUrl = s"jdbc:postgresql://${p_host}:${p_port}/$database"
 
-  private val schema = DataMappings.getYahooAPISchema
+  private val spark = SparkSessionProvider.getSparkSession
+  implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
+
+ private val schema = DataMappings.getYahooAPISchema
 
   private def createUrl(version: String,
                         symbol: String,
