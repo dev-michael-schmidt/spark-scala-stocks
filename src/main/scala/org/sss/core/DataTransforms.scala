@@ -10,8 +10,9 @@ class DataTransforms(val tickerSymbol: String,
                      val period1: Long,
                      val period2: Long,
                      val interval: String,
-                     val events: String = "history"
-                     ) extends StockMeta {
+                     override val events: String = "history",
+                     data: Option[DataFrame] = None,
+                     ) extends DataOperations {
 
   /*
   // Create an instance of DataTransforms
