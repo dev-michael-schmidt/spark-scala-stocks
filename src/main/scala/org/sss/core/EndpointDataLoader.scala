@@ -20,6 +20,7 @@ case class EndpointDataLoader(tickerSymbol: String,
                               events: String = "history",
                               version: String = "v8",
                               table: Option[String] = None) {
+  def getSymbol: DataFrame = {
 
   def getSymbol(symbol: String,
                 period1: Long,
