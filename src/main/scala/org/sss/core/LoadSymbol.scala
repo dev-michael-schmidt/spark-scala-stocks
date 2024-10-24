@@ -8,10 +8,9 @@ object LoadSymbol {
 
   def main(args: Array[String]): Unit = {
 
-    val loader = DataOperations(sym, 1722488400, 1725166800, "1d")
-    val df = loader.getSymbol
+    val loader = new DataTransforms("aapl", 1, 2, "1d")
+    val df = loader.fetchData()
 
-    loader.pushData(df, sym)
 
     println("we've reached the end")
   }
