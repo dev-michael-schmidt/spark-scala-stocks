@@ -205,7 +205,6 @@ object EndpointDataLoader {
         .save()
     }
 
-  /* defined, but not used */
   def fromDatabase(table: String): DataFrame = {
 
     val dataFrame = spark.read
@@ -216,7 +215,6 @@ object EndpointDataLoader {
       .option("password", password) // TODO: unacceptable secret's manager
       .option("dbtable", table)
       .load()
-
     dataFrame
   }
 }
