@@ -80,7 +80,6 @@ object EndpointDataLoader {
 
     // Send the request and get the response as a String
     val responseBody: String = client.send(request, BodyHandlers.ofString).body()
-
     val result = url match {
       case u if url.contains("v7") => fromV7API(responseBody)
       case u if url.contains("v8") => fromV8API(responseBody)
