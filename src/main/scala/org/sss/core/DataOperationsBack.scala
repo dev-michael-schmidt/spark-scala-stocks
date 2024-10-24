@@ -5,36 +5,35 @@ import org.apache.spark.sql.types.{LongType, MetadataBuilder}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.json4s.native.JsonMethods._
 import org.json4s._
-import org.sss.core.DataOperations.{createUrl, fetchDataFromUrl, toDatabase}
+
 
 import java.net.URI
 import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
 import scala.math.BigDecimal.RoundingMode
 
+/*
+class DataOperations(val tickerSymbol: String,
+                     val period1: Long,
+                     val period2: Long,
+                     val interval: String,
+                     override val events: String = "history",
+                     data: Option[DataFrame] = None,
+                    ) extends DataOps {
+
+
+
+
 case class DataOperations(val tickerSymbol: String,
                           val period1: Long,
                           val period2: Long,
-                          val interval: String) extends StockMeta {
+                          val interval: String) extends DataOps {
 
-  def fetchData: DataFrame = {
-
-    val financeURL: String = createUrl(tickerSymbol, period1, period2, interval, EVENTS, API_VERSION)
-    val result: DataFrame = fetchDataFromUrl(financeURL)
-    result
-  }
-
-  def pushData(df: DataFrame, table: String): Unit = {
-    val df = copy(table).fetchData
-    toDatabase(df, table)
-  }
-
-  def pushDatal(ticketSymbol: String): Unit = {
-    val df = copy(TABLE).fetchData
-    toDatabase(df, ticketSymbol)
-  }
+  def pushData(ticketSymbol: String): Unit = {
+    val df = fetchData(tickerSymbol, period1, period2, interval, EVENTS, API_VERSION)
 }
-
+*/
+/*
 object DataOperations {
 
   /* Postgres */
@@ -55,19 +54,33 @@ object DataOperations {
 
  private val schema = DataMappings.getYahooAPISchema
 
- def createUrl(sym: String,
-               period1: Long,
-               period2: Long,
-               interval: String,
-               events: String,
-               version: String): String = {
-   val url: String = version.toLowerCase match {
-     case "v8" => DataMappings.makeV8Url(sym, period1, period2, interval, events)
-     case "v7" => DataMappings.makeV7Url(sym, period1, period2, interval, events)
-     case _ => throw new IllegalArgumentException(s"Unsupported API version: $version")
-   }
-   url
- }
+// def createUrl(sym: String,
+//               period1: Long,
+//               period2: Long,
+//               interval: String,
+//               events: String,
+//               version: String): String = {
+//   val url: String = version.toLowerCase match {
+//     case "v8" => DataMappings.makeV8Url(sym, period1, period2, interval, events)
+//     case "v7" => DataMappings.makeV7Url(sym, period1, period2, interval, events)
+//     case _ => throw new IllegalArgumentException(s"Unsupported API version: $version")
+//   }
+//   url
+//  }
+  private def fetchData(tickerSymbol: String,
+                        period1: Long,
+                        period2: Long,
+                        interval: String,
+                        events: Some[String],
+                        apiVersion: Some[String]): DataFrame = {
+
+
+    val e = if envents
+    val financeURL: String = createUrl(tickerSymbol, period1, period2, interval, EVENTS, API_VERSION)
+    val result: DataFrame = fetchDataFromUrl(financeURL)
+    result
+  }
+
   private def fetchDataFromUrl(url: String): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
@@ -215,3 +228,4 @@ object DataOperations {
     dataFrame
   }
 }
+*/
