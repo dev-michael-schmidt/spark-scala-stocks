@@ -22,14 +22,7 @@ case class EndpointDataLoader(tickerSymbol: String,
                               table: Option[String] = None) {
   def getSymbol: DataFrame = {
 
-  def getSymbol(symbol: String,
-                period1: Long,
-                period2: Long,
-                interval: String,
-                version: String = "v8",
-                events: String = "history"): DataFrame = {
-
-    val financeURL: String = createUrl(version, symbol, period1, period2, interval, events)
+    val financeURL: String = createUrl(tickerSymbol, period1, period2, interval, events, version.toLowerCase)
     val result: DataFrame = fetchDataFromUrl(financeURL)
     result
   }
