@@ -4,8 +4,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{LongType, MetadataBuilder}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.json4s.native.JsonMethods._
-import org.json4s.{DefaultFormats, _}
-import org.sss.core.EndpointDataLoader.{createUrl, fetchDataFromUrl, toDatabase}
+import org.json4s._
+import org.sss.core.DataOperations.{createUrl, fetchDataFromUrl, toDatabase}
 
 import java.net.URI
 import java.net.http.HttpResponse.BodyHandlers
