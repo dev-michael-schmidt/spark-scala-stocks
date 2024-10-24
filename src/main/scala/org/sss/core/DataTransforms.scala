@@ -53,11 +53,6 @@ class DataTransforms(val tickerSymbol: String,
   def withData(df: DataFrame): DataTransforms = {
     this.copy(data = Some(df)) // Return a new instance (of self) with the DataFrame attached
   }
-  /*
-  val someData: DataFrame = spark.read. ...
-  val transformWithData = DataTransforms("AAPL").withData(someData)
-  transformWithData.process() // This will use the provided DataFrame instead of fetching
-  */
 
 //   TODO: Advance usage interpolate from table by periods 1 & 2
 //  def interpolate(table: String, period1: Long, period2: Long): DataFrame = {
