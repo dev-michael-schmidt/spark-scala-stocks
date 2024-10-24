@@ -13,10 +13,9 @@ class DataTransforms(val tickerSymbol: String,
                      val events: String = "history"
                      ) extends StockMeta {
 
-  // override val tickerSymbol: String = tickerSymbol
-//  override val period1: Long = period1
-//  override val period2: Long = period2
-//  override val interval: String = interval
+  /*
+  // Create an instance of DataTransforms
+  val transformer = new DataTransforms("AAPL", 1609459200L, 1640995200L, "1d")
 
 //  override def fetchData: DataFrame = {
 //    //val dataTransforms.
