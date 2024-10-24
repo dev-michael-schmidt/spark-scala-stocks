@@ -16,7 +16,6 @@ case class EndpointDataLoader(tickerSymbol: String,
                               period1: Long,
                               period2: Long,
                               interval: String,
-                              version: String = "v8",
                               events: String = "history",
                               version: String = "v8",
                               table: Option[String] = None) {
