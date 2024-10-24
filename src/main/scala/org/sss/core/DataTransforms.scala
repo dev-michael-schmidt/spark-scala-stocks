@@ -17,21 +17,16 @@ class DataTransforms(val tickerSymbol: String,
   // Create an instance of DataTransforms
   val transformer = new DataTransforms("AAPL", 1609459200L, 1640995200L, "1d")
 
-//  override def fetchData: DataFrame = {
-//    //val dataTransforms.
-//    "foo"
-//  }
+  // Interpolate by fetching data from a table and return a new instance
+  val dataFrameWithInterpolation = transformer.interpolate(table) // String
 
-  def interpolate() = {
-    val df = data.getOrElse(fetchData(tickerSymbol))
-    val completedData = DataTransforms.fillMissing(df)
-    completedData
-  }
+  // Interpolate using a DataFrame directly and return a new instance
+  val dataFrameWithInterpolation = transform.interpolate(dataFrame) // DataFrame
 
-  def interpolate(dataFrame: DataFrame): DataFrame = {
-    val completedData = DataTransforms.fillMissing(dataFrame)
-    completedData
-  }
+  // Access the updated data
+  val fromTableDataFrame = newTransformWithTableData.data
+  val fromDataFrame = newTransformWithDataFrame.data
+  */
 
   def interpolate(table: String): Unit = {
     val df = fetchData(table)
