@@ -12,16 +12,14 @@ import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
 import scala.math.BigDecimal.RoundingMode
 
-case class EndpointDataLoader(tickerSymbol: String,
-                              period1: Long,
-                              period2: Long,
-                              interval: String,
-                              events: String = "history",
-                              version: String = "v8",
-                              table: Option[String] = None) {
-  def getSymbol: DataFrame = {
+case class DataOperations(val tickerSymbol: String,
+                          val period1: Long,
+                          val period2: Long,
+                          val interval: String) extends StockMeta {
 
-    val financeURL: String = createUrl(tickerSymbol, period1, period2, interval, events, version.toLowerCase)
+  def fetchData: DataFrame = {
+
+    val financeURL: String = createUrl(tickerSymbol, period1, period2, interval, EVENTS, API_VERSION)
     val result: DataFrame = fetchDataFromUrl(financeURL)
     result
   }
