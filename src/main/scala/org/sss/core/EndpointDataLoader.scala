@@ -65,20 +65,19 @@ object EndpointDataLoader {
 
  private val schema = DataMappings.getYahooAPISchema
 
-  private def createUrl(version: String,
-                        symbol: String,
-                        period1: Long,
-                        period2: Long,
-                        interval: String,
-                        events: String): String = {
-    val url: String = version match {
-      case "v8" => DataMappings.makeV8Url(symbol, period1, period2, interval, events)
-      case "v7" => DataMappings.makeV7Url(symbol, period1, period2, interval, events)
-      case _    => throw new IllegalArgumentException(s"Unsupported API version: $version")
-    }
-    url
-  }
-
+ def createUrl(sym: String,
+               period1: Long,
+               period2: Long,
+               interval: String,
+               events: String,
+               version: String): String = {
+   val url: String = version.toLowerCase match {
+     case "v8" => DataMappings.makeV8Url(sym, period1, period2, interval, events)
+     case "v7" => DataMappings.makeV7Url(sym, period1, period2, interval, events)
+     case _ => throw new IllegalArgumentException(s"Unsupported API version: $version")
+   }
+   url
+ }
   private def fetchDataFromUrl(url: String): DataFrame = {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
