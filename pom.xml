@@ -44,7 +44,7 @@
             <goals>
               <goal>single</goal>
             </goals>
-        </execution>
+          </execution>
         </executions>
       </plugin>
 
@@ -63,7 +63,7 @@
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
           <appendAssemblyId>false</appendAssemblyId>
-           <outputDirectory>jars</outputDirectory>
+          <outputDirectory>jars</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -118,6 +118,12 @@
     </pluginManagement>
   </build>
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/com.github.pureconfig/pureconfig-core -->
+    <dependency>
+      <groupId>com.github.pureconfig</groupId>
+      <artifactId>pureconfig-core_2.12</artifactId>
+      <version>0.17.7</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
     <dependency>
       <groupId>org.scala-lang</groupId>
@@ -139,15 +145,33 @@
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>2.0.16</version> <!-- was .12 -->
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>2.0.16</version> <!-- was .12 -->
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.7.4</version>
+    </dependency>
+    <!-- Dependency for Json4s core functionalities -->
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-core_2.12</artifactId>
+      <version>3.7.0-M5</version>
+    </dependency>
+    <!-- Dependency for Json4s native support -->
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-native_2.12</artifactId>
+      <version>3.7.0-M5</version>
+    </dependency>
+    <!-- Dependency for Json4s support with Jackson -->
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-jackson_2.12</artifactId>
+      <version>3.7.0-M5</version>
     </dependency>
 
     <!--    <dependency>-->
@@ -176,27 +200,5 @@
     <!--    	<artifactId>spark-mllib_2.11</artifactId>-->
     <!--    	<version>2.3.0</version>-->
     <!--    </dependency>-->
-
-    <!-- Dependency for Json4s core functionalities -->
-    <dependency>
-        <groupId>org.json4s</groupId>
-        <artifactId>json4s-core_2.12</artifactId>
-        <version>3.7.0-M5</version>
-    </dependency>
-
-    <!-- Dependency for Json4s native support -->
-    <dependency>
-        <groupId>org.json4s</groupId>
-        <artifactId>json4s-native_2.12</artifactId>
-        <version>3.7.0-M5</version>
-    </dependency>
-
-    <!-- Dependency for Json4s support with Jackson -->
-    <dependency>
-        <groupId>org.json4s</groupId>
-        <artifactId>json4s-jackson_2.12</artifactId>
-        <version>3.7.0-M5</version>
-    </dependency>
-
   </dependencies>
 </project>
