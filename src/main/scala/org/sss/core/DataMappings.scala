@@ -8,8 +8,9 @@ import org.json4s.jackson.JsonMethods._
 object DataMappings extends App {
 
   private val validRanges: List[String] = List("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max")
+  val dayInSeconds = 86400
   private val sixtyDaySpan: Long = 5184000
-  private val sevenDaySpan: Long =604800
+  private val sevenDaySpan: Long = 604800
 
   case class Timestamp(timestamps: List[Long])
   case class TradingPeriod(timezone: String, end: Long, start: Long, gmtoffset: Int)
@@ -59,19 +60,18 @@ object DataMappings extends App {
     s"${sym}?period1=${p1}&period2=${p2}&interval=${ivl}&events=${e}"
   }
 
-  def makeV7Url(symbol: String, period1: Long, period2: Long, interval: String, events: String): String = {
+  def makeV7Url(sym: String, period1: Long, period2: Long, interval: String, events: String): String = {
     "https://query1.finance.yahoo.com/v7/finance/download/" + urlParameters(
-      sym = symbol,
+      sym = sym,
       p1 = period1,
       p2 = period2,
       ivl = interval,
       e = events)
-
   }
 
-  def makeV8Url(symbol: String, period1: Long, period2: Long, interval: String, events: String): String = {
+  def makeV8Url(sym: String, period1: Long, period2: Long, interval: String, events: String): String = {
     "https://query2.finance.yahoo.com/v8/finance/chart/" + urlParameters(
-      sym = symbol,
+      sym = sym,
       p1 = period1,
       p2 = period2,
       ivl = interval,

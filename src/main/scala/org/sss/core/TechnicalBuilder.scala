@@ -1,16 +1,17 @@
-package org.sss.technicals
+package org.sss.core
 
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession, functions => F}
 
-case class TechnicalBuilder(var df: DataFrame) {
+case class TechnicalBuilder(var dataFrame: DataFrame){
+
 
   // Simple moving average (default 10 in days)
   def SMA(days: Int = 10): TechnicalBuilder = {
-    val windowSpec = Window.orderBy("date").rowsBetween(-days + 1, 0)
+    val windowSpec = Window.orderBy("tstamp").rowsBetween(-days + 1, 0)
     val columnName = s"sma_${days}d"
-    df = df.withColumn(columnName, avg(col("close")).over(windowSpec))
+    dataFrame = dataFrame.withColumn(columnName, avg(col("close")).over(windowSpec))
     this
   }
 
@@ -24,10 +25,9 @@ case class TechnicalBuilder(var df: DataFrame) {
       closePrices.foldLeft(0.0)((prev, curr) => alpha * curr + (1 - alpha) * prev)
     })
 
-    val windowSpec = Window.orderBy("date").rowsBetween(Window.unboundedPreceding, Window.currentRow)
-    df = df.withColumn(columnName, emaUdf(collect_list(col("close")).over(windowSpec)))
+    val windowSpec = Window.orderBy("tstamp").rowsBetween(Window.unboundedPreceding, Window.currentRow)
+    dataFrame = dataFrame.withColumn(columnName, emaUdf(collect_list(col("close")).over(windowSpec)))
     this
   }
-
-  def build(): DataFrame = df
+  def getDataFrame: DataFrame = { dataFrame }
 }
