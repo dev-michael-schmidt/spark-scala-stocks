@@ -88,22 +88,9 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
 
   override def writeToDatabase(table: String): Unit = {
 
-    dataFrame = contiguousDataframe
-      .drop("prev_tstamp")
-      .drop("diff")
-    this
-  }
+    val df = checkForDataFrame()
 
-  override def writeToDatabase(df: DataFrame, table: String): Unit = {
-
-    def getEnvVariable(key: String): String = {
-      val value = Option(System.getenv(key)).getOrElse {
-        throw new IllegalArgumentException(s"$key is NOT set")
-      }
-      value
-    }
-
-    dataFrame.write
+    df.write
       .format("jdbc")
       .option("url", dbUrl)
       .option("dbtable", table)
