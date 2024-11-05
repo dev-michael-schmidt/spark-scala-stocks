@@ -114,7 +114,9 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
       .save()
   }
 
-  override def getDataFrame: DataFrame = { dataFrame }
+  override def getDataFrame: DataFrame = {
+   checkForDataFrame()
+  }
 
   // utilities
   private def createUrl(sym: String,
@@ -130,6 +132,20 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
       case _ => throw new IllegalArgumentException(s"Unsupported API version: $version")
     }
     url
+  }
+
+  private def checkForDataFrame(): DataFrame = {
+    val df = Option(dataFrame)
+    dataFrame = df.getOrElse {
+
+      logger.warn("dataFrame does not exist! creating an empty one with a schema")
+
+      val emptyRDD = spark.sparkContext.emptyRDD[Row]
+      val emptyDF = spark.createDataFrame(emptyRDD, schema)
+
+      emptyDF
+    }
+    dataFrame
   }
 
   private def fromV8API(responseBody: String): DataFrame = {
