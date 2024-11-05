@@ -13,9 +13,7 @@ trait DataPipelineabstract{
 
   def loadFromDatabase(table: String): DataPipelineabstract
 
-  def writeToDatabase(dataFrame: DataFrame, table: String): Unit
-
-  def interpolate(): DataPipelineabstract
+  def writeToDatabase(table: String): Unit
 
   def getDataFrame: DataFrame
 }
