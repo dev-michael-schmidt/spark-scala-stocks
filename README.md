@@ -1,6 +1,6 @@
 # spark-scala-stocks
 
-A complete, end-to-end, financial ETL pipeline. I learned Apache Spark, Apache Airflow, Grafana, and Scala.
+I delivered on a complete, end-to-end, financial ETL pipeline. I learned 4 stack items in the process: Apache Spark, Apache Airflow, Grafana, and Scala.  
 
 <img src="https://github.com/dev-michael-schmidt/spark-scala-stocks/blob/master/4_grid_example.png" width="960px" height="auto">
 
