@@ -15,5 +15,7 @@ trait DataPipelineabstract{
 
   def writeToDatabase(table: String): Unit
 
+  def dropData(table: String): DataPipelineabstract
+
   def getDataFrame: DataFrame
 }

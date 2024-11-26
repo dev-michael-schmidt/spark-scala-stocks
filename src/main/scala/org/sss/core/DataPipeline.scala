@@ -14,7 +14,8 @@ import java.net.http.HttpResponse.BodyHandlers
 import java.net.http.{HttpClient, HttpRequest}
 import scala.math.BigDecimal.RoundingMode
 
-class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipelineabstract {
+class DataPipeline(private var dataFrame: DataFrame = null,
+                   private var metaData: Option[DataFrame] = null) extends DataPipelineabstract {
 
   private val logger = Logger.getLogger(getClass.getName)
   private val spark = SparkSessionProvider.getSparkSession
@@ -24,21 +25,20 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
 
 
   /* Postgres */
-  val user: String = "airflow" //getEnvVariable(System.getenv("POSTGRES_USER"))// .getOrElse("'POSTGRES_USER' not set")
-  val password = "airflow" //getEnvVariable()//Option(System.getenv("POSTGRES_PASSWORD"))//.getOrElse("'POSTGRES_PASSWORD' not set") // don't use env's in prod either
+  private val user: String = "airflow" //getEnvVariable(System.getenv("POSTGRES_USER"))// .getOrElse("'POSTGRES_USER' not set")
+  private val password = "airflow" //getEnvVariable()//Option(System.getenv("POSTGRES_PASSWORD"))//.getOrElse("'POSTGRES_PASSWORD' not set") // don't use env's in prod either
 
-  val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("localhost")
-  val port: String = System.getenv("POSTGRES_PORT")
+  private val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("localhost")
+  private val port: String = System.getenv("POSTGRES_PORT")
 
-  val format: String = "jdbc"
-  val schema: StructType = DataMappings.getYahooAPISchema
+  private val format: String = "jdbc"
+  private val schema: StructType = DataMappings.getYahooAPISchema
 
-  val database: String = System.getenv("POSTGRES_DB")
-  val mode: String = System.getenv("DB_SAVE_MODE") // ! currently overwrite
+  private val database: String = System.getenv("POSTGRES_DB")
+  private val mode: String = System.getenv("DB_SAVE_MODE") // ! currently overwrite
 
-  val driver = System.getenv("DB_DRIVER")
-  val dbUrl = s"jdbc:postgresql://${host}:${port}/$database"
-
+  private val driver = System.getenv("DB_DRIVER")
+  private val dbUrl = s"jdbc:postgresql://${host}:${port}/$database"
 
   override def loadFromDatabase(table: String): DataPipelineabstract = {
     dataFrame = spark.read
@@ -72,7 +72,8 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
     val responseBody = if (response.statusCode() == 200) {
       response.body()
     } else {
-      throw new RuntimeException(s"response return code ${response.statusCode()}, not 200")
+      logger.error(s"YahooAPI returned a non-200 code, it was ${response.statusCode()} instead")
+      throw new RuntimeException(s"Unable to capture stock data")
     }
 
     dataFrame = apiVersion.toLowerCase match {
@@ -88,8 +89,7 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
 
   override def writeToDatabase(table: String): Unit = {
 
-    val df = checkForDataFrame()
-
+    val df = getOrCreateEmpty()
     df.write
       .format("jdbc")
       .option("url", dbUrl)
@@ -102,7 +102,14 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
   }
 
   override def getDataFrame: DataFrame = {
-   checkForDataFrame()
+   getOrCreateEmpty()
+  }
+
+  override def dropData(table: String): DataPipeline = {
+    logger.warn(s"This pipeline's dataframe will empty")
+    val emptyRDD = spark.sparkContext.emptyRDD[Row]
+    dataFrame = spark.createDataFrame(emptyRDD, schema)
+    this
   }
 
   // utilities
@@ -121,7 +128,7 @@ class DataPipeline(private var dataFrame: DataFrame = null) extends DataPipeline
     url
   }
 
-  private def checkForDataFrame(): DataFrame = {
+  private def getOrCreateEmpty(): DataFrame = {
     val df = Option(dataFrame)
     dataFrame = df.getOrElse {
 

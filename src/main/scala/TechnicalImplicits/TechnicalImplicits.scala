@@ -60,7 +60,7 @@ package object TechnicalImplicits {
         val result = contiguousDataframe
           .drop("prev_tstamp")
           .drop("diff")
-        new DataPipeline(result)
+        new DataPipeline(result, None)
       }
 
       def SMA(span: Int = 10): DataPipeline = {
@@ -68,7 +68,7 @@ package object TechnicalImplicits {
         val columnName = s"sma_${span}d"
         val dataFrame = pl.getDataFrame
           .withColumn(columnName, avg(col("close")).over(windowSpec))
-        new DataPipeline(dataFrame)
+        new DataPipeline(dataFrame, None)
       }
 
       def EMA(span: Int = 10): DataPipeline = {
@@ -82,7 +82,7 @@ package object TechnicalImplicits {
         val windowSpec = Window.orderBy("tstamp").rowsBetween(Window.unboundedPreceding, Window.currentRow)
         val result = pl.getDataFrame
           .withColumn(columnName, emaUdf(collect_list(col("close")).over(windowSpec)))
-        new DataPipeline(result)
+        new DataPipeline(result, None)
       }
     }
 }
