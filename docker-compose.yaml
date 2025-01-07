@@ -97,32 +97,42 @@ x-airflow-common:
       condition: service_healthy
 
 services:
-  sss-portainer:
-    image: portainer/portainer-ce:2.21.0
-    container_name: sss-portainer
-    # user: "${UID}:${GID}"  # Use the user and group from the environment
-    hostname: sss-portainer
-    domainname: sss-portainer.home.lan
-    restart: always
+
+  zookeeper:
+    image: zookeeper:latest
+    container_name: sss-zookeeper
+    hostname: sss-zookeeper
     ports:
-      - "9000:9000"
-      - "9443:9443"
-      - "8088:8000"
-      - "8443:8443"
+      - "2181:2181"
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: sss-kafka
+    hostname: sss-kafka
+    ports:
+      - "9092:9092"
+    expose:
+      - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "my-topic"
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'healthcheck-message' | kafka-console-producer.sh --broker-list localhost:9092 --topic health-check-topic && kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic health-check-topic --from-beginning --max-messages 1 | grep 'healthcheck-message'" ]
+      interval: 15s
+      timeout: 10s
+      retries: 3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/portainer_data:/data
-    healthcheck:
-      test: [ 'CMD', 'portainer', '--healthcheck' ]
 
   sss-postgres:
     image: postgres:13-alpine
     container_name: sss-postgres
     # user: "${UID}:${GID}"  # Use the user and group from the environment
     hostname: sss-postgres
-    domainname: sss-postgres.home.lan
-    depends_on:
-      - sss-portainer
     env_file:
       - ".env"
     environment: # these will override the env_file env-vars
@@ -130,7 +140,7 @@ services:
       - POSTGRES_PASSWORD=airflow # TODO: Okay for dev, Use secretes in prod
       - POSTGRES_DB=airflow
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./data/postgres_data:/var/lib/postgresql/data
       # - ./src/main/resources/schemas:/var/lib/postgresql/schemas
@@ -163,10 +173,11 @@ services:
     <<: *airflow-common
     command: webserver
     container_name: sss-webserver
+    domainname: webserver.sss.lan
     ports:
-      - "8080:8080"
+      - "8081:8080"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "--fail", "http://localhost:8081/health"]
       interval: 30s
       timeout: 10s
       retries: 5
