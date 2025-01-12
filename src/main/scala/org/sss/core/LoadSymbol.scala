@@ -9,7 +9,7 @@ object LoadSymbol {
 
   def main(args: Array[String]): Unit = {
 
-    val apple = new DataPipeline()
+    val spy = new DataPipeline()
       .loadFromUrl(sym, 1727833579, 1730511979, "1d")
       .interpolate
       .EMA(10)
