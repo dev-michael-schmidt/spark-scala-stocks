@@ -80,8 +80,9 @@ class DataPipeline(private var dataFrame: DataFrame = null,
     val responseBody = if (response.statusCode() == 200) {
       response.body()
     } else {
-      logger.error(s"YahooAPI returned a non-200 code, it was ${response.statusCode()} instead")
-      throw new RuntimeException(s"Unable to capture stock data")
+      val message = s"YahooAPI returned a non-200 code, it returned ${response.statusCode()} instead"
+      logger.error(message)
+      throw new RuntimeException(message)
     }
 
     dataFrame = apiVersion.toLowerCase match {
@@ -255,7 +256,7 @@ class DataPipeline(private var dataFrame: DataFrame = null,
       }.toMap
     }
 
-  val roundPrecision = 3
+  private val roundPrecision = 3
   def roundAt(precision: Int)(n: Double): Double = {
     BigDecimal(n).setScale(precision, RoundingMode.HALF_UP).toDouble
   }
