@@ -4,7 +4,7 @@ import TechnicalImplicits.PipelineActions
 
 object LoadSymbol {
 
-  private val sym = "aapl" // System.getenv("SYMBOL")
+  private val sym = System.getenv("SYMBOL")
   private val table = sym
 
   def main(args: Array[String]): Unit = {
