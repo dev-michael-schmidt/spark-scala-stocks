@@ -17,6 +17,7 @@ import scala.math.BigDecimal.RoundingMode
 class DataPipeline(private var dataFrame: DataFrame = null,
                    private var metaData: Option[DataFrame] = null) extends DataPipelineabstract {
 
+  private val appName = System.getenv("APP_NAME")
   private val logger = Logger.getLogger(getClass.getName)
   private val spark = SparkSessionProvider.getSparkSession
 
@@ -25,14 +26,19 @@ class DataPipeline(private var dataFrame: DataFrame = null,
 
 
   /* Postgres */
-  private val user: String = "airflow" //getEnvVariable(System.getenv("POSTGRES_USER"))// .getOrElse("'POSTGRES_USER' not set")
-  private val password = "airflow" //getEnvVariable()//Option(System.getenv("POSTGRES_PASSWORD"))//.getOrElse("'POSTGRES_PASSWORD' not set") // don't use env's in prod either
+  private val user = Option(System.getenv("POSTGRES_USER")).getOrElse("airflow")
+  private val password = Option(System.getenv("POSTGRES_PASSWORD")).getOrElse("airflow")
 
-  private val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("localhost")
-  private val port: String = System.getenv("POSTGRES_PORT")
+  private val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("airflow")
+  private val port = Option(System.getenv("POSTGRES_PORT")).getOrElse(5432)
+  private val postgresDb = Option(System.getenv("POSTGRES_DB")).getOrElse("airflow")
 
-  private val format: String = "jdbc"
-  private val schema: StructType = DataMappings.getYahooAPISchema
+  private val connectTimeout = Option(System.getenv("CONNECT_TIMEOUT")).getOrElse(30)
+  private val currentSchema = Option(System.getenv("CURRENT_SCHEMA")).getOrElse("public")
+  private val charSet = Option(System.getenv("CHAR_SET")).getOrElse("UTF-8")
+  private val dBmode = Option(System.getenv("MODE")).getOrElse("overwrite")
+  private val dBformat = Option(System.getenv("DATABASE_FORMAT")).getOrElse("jdbc")
+  private val dBDriver = Option(System.getenv("DATABASE_DRIVER")).getOrElse("org.postgresql.Driver")
 
   private val database: String = System.getenv("POSTGRES_DB")
   private val mode: String = System.getenv("DB_SAVE_MODE") // ! currently overwrite
