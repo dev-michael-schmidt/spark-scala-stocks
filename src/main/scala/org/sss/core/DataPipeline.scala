@@ -68,10 +68,10 @@ class DataPipeline(private var dataFrame: DataFrame = null,
                            interval: String,
                            events: String = "history",
                            apiVersion: String = "v8"): DataPipeline = {
-    val url = createUrl(tickerSymbol, period1, period2, interval)
+    val queryURL = createUrl(tickerSymbol, period1, period2, interval)
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
-      .uri(URI.create(url))
+      .uri(URI.create(queryURL))
       .GET() // request type
       .build()
 
