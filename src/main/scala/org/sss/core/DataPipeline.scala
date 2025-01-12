@@ -117,9 +117,9 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   }
 
   override def dropData(table: String): DataPipeline = {
-    logger.warn(s"This pipeline's dataframe will empty")
+    logger.warn(s"This pipeline's dataframe contents will be emptied")
     val emptyRDD = spark.sparkContext.emptyRDD[Row]
-    dataFrame = spark.createDataFrame(emptyRDD, schema)
+    dataFrame = spark.createDataFrame(emptyRDD, yahooSchema)
     this
   }
 
