@@ -21,9 +21,8 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   private val logger = Logger.getLogger(getClass.getName)
 
   private val spark = SparkSessionProvider.getSparkSession
-
   import spark.implicits._
-  implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
+  implicit val formats: DefaultFormats.type = DefaultFormats  // Required for extracting values (json4s)
 
   /* Postgres */
   private val user = Option(System.getenv("POSTGRES_USER")).getOrElse("airflow")
