@@ -250,8 +250,8 @@ class DataPipeline(private var dataFrame: DataFrame = null,
               flattenJson(JObject(key -> nestedValue), s"$prefix$key[$idx].") // Recursive call
           }.toMap
         case (key, _) =>
-          // Handle other cases as needed
-          Map.empty[String, Any]
+        // Handle other cases as needed
+        Map.empty[String, Any]
       }.toMap
     }
 
