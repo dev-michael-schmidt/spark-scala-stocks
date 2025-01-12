@@ -19,11 +19,11 @@ class DataPipeline(private var dataFrame: DataFrame = null,
 
   private val appName = System.getenv("APP_NAME")
   private val logger = Logger.getLogger(getClass.getName)
+
   private val spark = SparkSessionProvider.getSparkSession
 
   import spark.implicits._
   implicit val formats: DefaultFormats.type = DefaultFormats   // Required for extracting values (json4s)
-
 
   /* Postgres */
   private val user = Option(System.getenv("POSTGRES_USER")).getOrElse("airflow")
@@ -61,7 +61,6 @@ class DataPipeline(private var dataFrame: DataFrame = null,
 
     this
   }
-
   override def loadFromUrl(tickerSymbol: String,
                            period1: Long,
                            period2: Long,
@@ -98,7 +97,9 @@ class DataPipeline(private var dataFrame: DataFrame = null,
 
   override def writeToDatabase(table: String): Unit = {
 
+
     val df = getOrCreateEmpty()
+
     df.write
       .format("jdbc")
       .option("url", dbUrl)
@@ -258,5 +259,4 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   def roundAt(precision: Int)(n: Double): Double = {
     BigDecimal(n).setScale(precision, RoundingMode.HALF_UP).toDouble
   }
-
 }
