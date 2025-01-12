@@ -14,9 +14,8 @@ object LoadSymbol {
       .interpolate
       .EMA(10)
       .SMA(10)
-       println("we've nearly reached the end")
 
-    apple.writeToDatabase(sym)
+    spy.writeToDatabase(table)
     println("we've reached the end")
   }
 }
