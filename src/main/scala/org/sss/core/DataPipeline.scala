@@ -102,13 +102,13 @@ class DataPipeline(private var dataFrame: DataFrame = null,
     val df = getOrCreateEmpty()
 
     df.write
-      .format("jdbc")
+      .format(dBformat)
       .option("url", dbUrl)
       .option("dbtable", table)
       .option("user", user)
       .option("password", password)
-      .option("driver", driver)
-      .mode(mode)
+      .option("driver", dBDriver)
+      .mode(dBmode)
       .save()
   }
 
@@ -146,7 +146,7 @@ class DataPipeline(private var dataFrame: DataFrame = null,
       logger.warn("dataFrame does not exist! creating an empty one with a schema")
 
       val emptyRDD = spark.sparkContext.emptyRDD[Row]
-      val emptyDF = spark.createDataFrame(emptyRDD, schema)
+      val emptyDF = spark.createDataFrame(emptyRDD, yahooSchema)
 
       emptyDF
     }
