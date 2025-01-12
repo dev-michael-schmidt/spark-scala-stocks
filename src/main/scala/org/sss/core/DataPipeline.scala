@@ -51,11 +51,11 @@ class DataPipeline(private var dataFrame: DataFrame = null,
 
   override def loadFromDatabase(table: String): DataPipelineabstract = {
     dataFrame = spark.read
-      .format("jdbc")
-      .option("driver", driver)
+      .format(dBformat)
+      .option("driver", dBDriver)
       .option("url", dbUrl)
       .option("user", user)
-      .option("password", password) // TODO: unacceptable secret's manager
+      .option("password", password) // TODO: secret's manager??
       .option("dbtable", table)
       .load()
 
