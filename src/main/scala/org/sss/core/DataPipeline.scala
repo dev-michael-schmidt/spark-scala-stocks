@@ -40,11 +40,14 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   private val dBformat = Option(System.getenv("DATABASE_FORMAT")).getOrElse("jdbc")
   private val dBDriver = Option(System.getenv("DATABASE_DRIVER")).getOrElse("org.postgresql.Driver")
 
-  private val database: String = System.getenv("POSTGRES_DB")
-  private val mode: String = System.getenv("DB_SAVE_MODE") // ! currently overwrite
-
-  private val driver = System.getenv("DB_DRIVER")
-  private val dbUrl = s"jdbc:postgresql://${host}:${port}/$database"
+  private val yahooSchema: StructType = DataMappings.getYahooAPISchema
+  private val dbUrl = s"jdbc:postgresql://${host}:${port}/${postgresDb}?" +
+    s"user=${user}&" +
+    s"password=${password}&" +
+    s"connectTimeout=${connectTimeout}&" +
+    s"currentSchema=${currentSchema}&" +
+    s"charSet=${charSet}&" +
+    s"applicationName=${appName}"
 
   override def loadFromDatabase(table: String): DataPipelineabstract = {
     dataFrame = spark.read
