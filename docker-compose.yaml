@@ -140,7 +140,7 @@ services:
       - POSTGRES_PASSWORD=airflow # TODO: Okay for dev, Use secretes in prod
       - POSTGRES_DB=airflow
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ./data/postgres_data:/var/lib/postgresql/data
       # - ./src/main/resources/schemas:/var/lib/postgresql/schemas
