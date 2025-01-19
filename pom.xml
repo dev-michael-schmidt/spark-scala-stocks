@@ -173,6 +173,12 @@
       <artifactId>json4s-jackson_2.12</artifactId>
       <version>3.7.0-M5</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>3.9.0</version>
+    </dependency>
 
     <!--    <dependency>-->
     <!--      <groupId>org.apache.spark</groupId>-->
