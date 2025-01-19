@@ -1,9 +1,10 @@
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
-import org.apache.spark.sql.functions.{avg, col, collect_list, lag, lit, udf}
-import org.sss.core.{DataPipeline, DataPipelineabstract, SparkSessionProvider}
+package org.sss
 
-package object TechnicalImplicits {
+import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
+import org.apache.spark.sql.functions._
+import org.sss.core.{DataPipeline, SparkSessionProvider}
+
+package object technicals {
 
     implicit class PipelineActions(pl: DataPipeline) {
 
