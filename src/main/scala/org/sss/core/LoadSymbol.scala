@@ -1,6 +1,6 @@
 package org.sss.core
 
-import TechnicalImplicits.PipelineActions
+import org.sss.technicals.PipelineActions
 
 object LoadSymbol {
 
