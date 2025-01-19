@@ -1,0 +1,27 @@
+FROM spark:3.5.2-scala2.12-java11-python3-ubuntu
+LABEL authors="mike"
+
+ENV APP_NAME=local
+P1=915170400
+P2=1704088800
+ENV INTERVAL=1d
+ENV SYMBOL=SPY
+ENV EVENTS=history
+ENV POSTGRES_USER=airflow
+ENV POSTGRES_DB=airflow
+ENV PRICES=prices
+ENV DB_SAVE_MODE=overwrite
+ENV DB_DRIVER=org.postgresql.Driver
+
+USER root
+RUN mkdir -p /app
+WORKDIR /app
+
+EXPOSE 5432
+
+# TODO parameterize this and use a generic name
+COPY libs/load_symbol/spark-scala-stock-1.0.jar sss.jar
+
+
+ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["java", "-jar", "sss.jar"]
