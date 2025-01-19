@@ -119,11 +119,11 @@
   </build>
   <dependencies>
     <!-- https://mvnrepository.com/artifact/com.github.pureconfig/pureconfig-core -->
-    <dependency>
-      <groupId>com.github.pureconfig</groupId>
-      <artifactId>pureconfig-core_2.12</artifactId>
-      <version>0.17.7</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.github.pureconfig</groupId>-->
+<!--      <artifactId>pureconfig-core_2.12</artifactId>-->
+<!--      <version>0.17.7</version>-->
+<!--    </dependency>-->
     <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
     <dependency>
       <groupId>org.scala-lang</groupId>
