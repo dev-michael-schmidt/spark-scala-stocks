@@ -5,7 +5,13 @@
 # Long-Term Supported (LTS) distribution.
 #
 # This JDK matches in both the dev environment, and the container
-# Environment and should ganurtee 100% Java compatibility
+# Environment and should guarantee 100% Java compatibility
+
+
+##############################################
+# docker build --tag sss/airflow-2.10-java11 .
+##############################################
+
 FROM apache/airflow:latest
 
 # Ideally, the host and container UID match allowing host access to container resources
