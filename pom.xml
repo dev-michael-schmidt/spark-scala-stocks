@@ -179,15 +179,12 @@
       <artifactId>kafka-clients</artifactId>
       <version>3.9.0</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.gojek.courier/courier -->
+    <!-- https://javadoc.io/doc/com.github.daddykotex/courier_2.13/latest/index.html -->
     <dependency>
-      <groupId>com.gojek.courier</groupId>
-      <artifactId>courier</artifactId>
-      <version>0.3.1</version>
+      <groupId>com.github.daddykotex</groupId>
+      <artifactId>courier_2.13</artifactId>
+      <version>3.2.0</version>
     </dependency>
-
-
-
 
     <!--    <dependency>-->
     <!--      <groupId>org.apache.spark</groupId>-->
