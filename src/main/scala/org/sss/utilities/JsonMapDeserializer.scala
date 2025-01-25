@@ -1,8 +1,8 @@
-package org.sss.stream
+package org.sss.utilities
 
 import org.apache.kafka.common.serialization.Deserializer
-import org.json4s.native.JsonMethods._
 import org.json4s.DefaultFormats
+import org.json4s.native.JsonMethods._
 
 class JsonMapDeserializer extends Deserializer[Map[String, String]] {
   implicit val formats: DefaultFormats.type = DefaultFormats

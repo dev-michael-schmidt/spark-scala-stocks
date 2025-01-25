@@ -1,11 +1,10 @@
-package org.sss.stream
+package org.sss.utilities
 
 import org.apache.kafka.common.serialization.Serializer
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.JValue
-import org.json4s.native.JsonMethods._
 import org.json4s.JsonDSL._
-import org.json4s.native.Serialization
+import org.json4s.native.JsonMethods._
 
 class JsonMapSerializer extends Serializer[Map[String, String]] {
 
