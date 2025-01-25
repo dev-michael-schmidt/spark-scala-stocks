@@ -4,11 +4,16 @@ import scala.util.matching.Regex
 
 object EmailLetter {
 
-  val emailUserName = Option(System.getenv("EMAIL_USERNAME")).getOrElse {
+  val emailUserAddress = Option(System.getenv("EMAIL_USER_EMAIL_ADDRESS")).getOrElse{
+    // we could use email address validation here, but maybe it should happened upstream
+    throw new IllegalStateException("No user `from` address specified.")
+  }
+
+  val emailUserName: String = Option(System.getenv("EMAIL_USERNAME")).getOrElse {
     println("ERROR System ENV-VAR `EMAIL_USERNAME` was not set") // Logging
     throw new Exception("Unable to extract email user's password")
   }
-   private val emailUserPassword = Option(System.getenv("EMAIL_USER_PASSWORD")).getOrElse {
+   val emailUserPassword: String = Option(System.getenv("EMAIL_USER_PASSWORD")).getOrElse {
     println("ERROR set ENV-VAR `EMAIL_USER_PASSWORD` was not set.") // Logging
     throw new Exception("Unable to extract email user's password")
   }
