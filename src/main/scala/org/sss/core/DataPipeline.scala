@@ -27,10 +27,10 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   private val password = Option(System.getenv("POSTGRES_PASSWORD")).getOrElse("airflow")
 
   private val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("airflow")
-  private val port = Option(System.getenv("POSTGRES_PORT")).getOrElse(5432)
+  private val port = Option(System.getenv("POSTGRES_PORT")).map(_.toInt).getOrElse(5432)
   private val postgresDb = Option(System.getenv("POSTGRES_DB")).getOrElse("airflow")
 
-  private val connectTimeout = Option(System.getenv("CONNECT_TIMEOUT")).getOrElse(30)
+  private val connectTimeout = Option(System.getenv("CONNECT_TIMEOUT")).map(_.toInt).getOrElse(30)
   private val currentSchema = Option(System.getenv("CURRENT_SCHEMA")).getOrElse("public")
   private val charSet = Option(System.getenv("CHAR_SET")).getOrElse("UTF-8")
   private val dBmode = Option(System.getenv("MODE")).getOrElse("overwrite")
