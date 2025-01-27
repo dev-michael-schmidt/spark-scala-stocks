@@ -34,6 +34,7 @@ object TestStreamer {
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
     producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer].getName)
     producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, classOf[JsonMapSerializer].getName)
+    producerProps.put(ProducerConfig.ACKS_CONFIG, "all") //
 
     val consumerProps = new Properties()
     consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
