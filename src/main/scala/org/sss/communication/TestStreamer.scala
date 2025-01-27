@@ -71,6 +71,7 @@ object TestStreamer {
       val records = consumer.poll(Duration.ofMillis(100))
       records.asScala.foreach { record =>
         println(s"Key: ${record.key()}, Value: ${record.value()}")
+        break
       }
     }
   }
