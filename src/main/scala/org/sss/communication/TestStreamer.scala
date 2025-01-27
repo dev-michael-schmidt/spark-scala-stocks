@@ -46,11 +46,15 @@ object TestStreamer {
 
     val producer = new KafkaProducer[String, Map[String, String]](producerProps)
     val consumer = new KafkaConsumer[String, Map[String, String]](consumerProps)
-    consumer.subscribe(singletonList(topic))
-
-    val messages = Map[String, String](
-      "id" -> "123",
-      "baz" -> "zab"
+    var partitionsAssigned = false
+    consumer.subscribe(
+      singletonList(topic),
+      new ConsumerRebalanceListener {
+        override def onPartitionsRevoked(partitions: java.util.Collection[TopicPartition]): Unit = {}
+        override def onPartitionsAssigned(partitions: java.util.Collection[TopicPartition]): Unit = {
+          partitionsAssigned = true
+        }
+      }
     )
 
     val record = new ProducerRecord[String, Map[String, String]](topic, messages)  //("keyz", topic, messages) // (topic, "keyz", messages)
