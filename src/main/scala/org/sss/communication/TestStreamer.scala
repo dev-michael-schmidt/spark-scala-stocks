@@ -57,13 +57,17 @@ object TestStreamer {
       }
     )
 
-    val record = new ProducerRecord[String, Map[String, String]](topic, messages)  //("keyz", topic, messages) // (topic, "keyz", messages)
-    producer.send(record)
-
-    var x = 10
-    while(true) {
-      producer.send(record)
+    // Wait until partitions are assigned
+    while (!partitionsAssigned) {
       consumer.poll(Duration.ofMillis(100))
+    }
+    println("Partition assigned")
+
+    // Produce messages in advance
+    producer.send(new ProducerRecord[String, Map[String, String]](topic, Map("keyz" -> "value1")))
+    producer.send(new ProducerRecord[String, Map[String, String]](topic, Map("keyz" -> "value2")))
+
+    while (true) {
       val records = consumer.poll(Duration.ofMillis(100))
       records.asScala.foreach { record =>
         println(s"Key: ${record.key()}, Value: ${record.value()}")
