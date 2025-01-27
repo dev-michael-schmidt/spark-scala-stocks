@@ -2,6 +2,7 @@ package org.sss.communication
 
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.sss.utilities.{JsonMapDeserializer, JsonMapSerializer}
 
@@ -9,6 +10,7 @@ import java.time.Duration
 import java.util.Collections.singletonList
 import java.util.Properties
 import scala.jdk.CollectionConverters.iterableAsScalaIterableConverter
+import scala.util.control.Breaks.break
 
 object TestStreamer {
 
