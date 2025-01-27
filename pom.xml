@@ -182,7 +182,7 @@
     <!-- https://javadoc.io/doc/com.github.daddykotex/courier_2.13/latest/index.html -->
     <dependency>
       <groupId>com.github.daddykotex</groupId>
-      <artifactId>courier_2.13</artifactId>
+      <artifactId>courier_2.12</artifactId>
       <version>3.2.0</version>
     </dependency>
 

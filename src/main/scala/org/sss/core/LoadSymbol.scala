@@ -1,5 +1,6 @@
 package org.sss.core
 
+import org.sss.communication.PostOffice
 import org.sss.technicals.PipelineActions
 
 object LoadSymbol {
@@ -8,6 +9,12 @@ object LoadSymbol {
   private val table = sym
 
   def main(args: Array[String]): Unit = {
+
+   PostOffice.sendEmail(
+     toEmailAddress="michael.w.schmidt@proton.me",
+     subject="Prepare to be dazzled",
+     content="Woah!!"
+   )
 
     val spy = new DataPipeline()
       .loadFromUrl(sym, 1727833579, 1730511979, "1d")

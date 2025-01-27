@@ -1,11 +1,10 @@
 package org.sss.core
 
-import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.functions.{col, lag, lit, unix_timestamp}
+import org.apache.log4j.Logger
+import org.apache.spark.sql.functions.{col, lit, unix_timestamp}
 import org.apache.spark.sql.types.{LongType, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
-import org.apache.log4j.Logger
-import org.json4s.JsonAST.{JBool, JDouble, JField, JInt, JString}
+import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods.parse
 import org.json4s.{DefaultFormats, JArray, JObject}
 
@@ -21,7 +20,6 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   private val logger = Logger.getLogger(getClass.getName)
 
   private val spark = SparkSessionProvider.getSparkSession
-  import spark.implicits._
   implicit val formats: DefaultFormats.type = DefaultFormats  // Required for extracting values (json4s)
 
   /* Postgres */
@@ -76,21 +74,15 @@ class DataPipeline(private var dataFrame: DataFrame = null,
     // Send the request and get the response as a String
     // val responseBody: String = client.send(request, BodyHandlers.ofString).body()
     val response = client.send(request, BodyHandlers.ofString())
-    val responseBody = if (response.statusCode() == 200) {
-      response.body()
-    } else {
-      val message = s"YahooAPI returned a non-200 code, it returned ${response.statusCode()} instead"
-      logger.error(message)
-      throw new RuntimeException(message)
+    val responseBody = response.statusCode() match {
+      case 200 => response.body()
+      case _ => throw new RuntimeException(s"YahooAPI returned a non-200 code, it was ${response.statusCode()}")
     }
 
     dataFrame = apiVersion.toLowerCase match {
       case "v8" => fromV8API(responseBody)
       case "v7" => fromV7API(responseBody)
-      case _ => {
-        println("foo")
-        throw new RuntimeException("foo")
-      }
+      case _ => throw new RuntimeException("Unsupport api version or version not implemented")
     }
     this
   }
@@ -250,7 +242,7 @@ class DataPipeline(private var dataFrame: DataFrame = null,
               flattenJson(JObject(key -> nestedValue), s"$prefix$key[$idx].") // Recursive call
           }.toMap
         case (key, _) =>
-        // Handle other cases as needed
+        // Handle other cases, but none needed at this time.
         Map.empty[String, Any]
       }.toMap
     }

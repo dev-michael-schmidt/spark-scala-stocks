@@ -44,3 +44,9 @@ build/
 .DS_Store
 /data/portainer_data/certs/cert.pem
 /data/portainer_data/certs/key.pem
+/.metals/metals.mv.db
+/data/portainer_data/portainer.db
+/data/portainer_data/portainer.key
+/data/portainer_data/chisel/private-key.pem
+/data/portainer_data/portainer.pub
+/.metals/metals.log

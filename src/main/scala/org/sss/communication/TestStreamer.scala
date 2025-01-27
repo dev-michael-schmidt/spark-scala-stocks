@@ -1,12 +1,14 @@
-package org.sss.stream
+package org.sss.communication
 
-import java.util.Properties
-import java.util.Collections.singletonList
-import java.time.Duration
-import scala.jdk.CollectionConverters.iterableAsScalaIterableConverter
+import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
-import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
+import org.sss.utilities.{JsonMapDeserializer, JsonMapSerializer}
+
+import java.time.Duration
+import java.util.Collections.singletonList
+import java.util.Properties
+import scala.jdk.CollectionConverters.iterableAsScalaIterableConverter
 
 object TestStreamer {
 
