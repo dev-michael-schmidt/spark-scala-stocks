@@ -62,7 +62,5 @@ object TestStreamer {
         println(s"Key: ${record.key()}, Value: ${record.value()}")
       }
     }
-
-    producer.send(record)
   }
 }
