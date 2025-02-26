@@ -54,7 +54,6 @@ class DataPipeline(private var dataFrame: DataFrame = null,
       .option("password", password) // TODO: secret's manager??
       .option("dbtable", table)
       .load()
-
     this
   }
   override def loadFromUrl(tickerSymbol: String,
