@@ -1,6 +1,7 @@
 package org.sss.core
 
-import org.sss.communication.PostOffice
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import org.sss.communication.MailPerson
 import org.sss.technicals.PipelineActions
 
 object LoadSymbol {
@@ -15,6 +16,17 @@ object LoadSymbol {
       .interpolate
       .EMA(10)
       .SMA(10)
+
+    val foo: Map[String, String] = Map(
+      "foo" -> "bar",
+      "baz" -> "bonkers"
+    )
+
+    val topic = "email-service.notifications"
+
+    val trade = new ProducerRecord[String, Map[String, String]](topic, foo)
+
+    TradeEvent.emit(trade)
 
     spy.writeToDatabase(table)
     println("we've reached the end")
