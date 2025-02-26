@@ -55,7 +55,7 @@ x-airflow-common:
   image: sss/airflow-2.10-java11
   build:
     context: .
-    dockerfile: Dockerfile.airflow
+    dockerfile: Dockerfile.bak.airflow
 
 
   # build: .
