@@ -22,17 +22,18 @@ class DataPipeline(private var dataFrame: DataFrame = null,
   private val spark = SparkSessionProvider.getSparkSession
   implicit val formats: DefaultFormats.type = DefaultFormats  // Required for extracting values (json4s)
 
-  /* Postgres */
-  private val user = Option(System.getenv("POSTGRES_USER")).getOrElse("airflow")
-  private val password = Option(System.getenv("POSTGRES_PASSWORD")).getOrElse("airflow")
+  private val dbConfig = Map(
+    "appName" -> System.getenv("APP_NAME"),
+    "dbUser" -> Option(System.getenv("POSTGRES_USER")).getOrElse("airflow"),
+    "password" ->Option(System.getenv("POSTGRES_PASSWORD")).getOrElse("airflow"),
+    "host" -> Option(System.getenv("POSTGRES_HOST")).getOrElse("airflow"),
+    "port" -> Option(System.getenv("POSTGRES_PORT")).map(_.toInt).getOrElse(5432),
+    "postgresDb" -> Option(System.getenv("POSTGRES_DB")).getOrElse("airflow"),
+    "connectTimeout" -> Option(System.getenv("CONNECT_TIMEOUT")).map(_.toInt).getOrElse(30),
+    "charSet" -> Option(System.getenv("CHAR_SET")).getOrElse("UTF-8"),
+    "currentSchema" -> Option(System.getenv("CURRENT_SCHEMA")).getOrElse("public")
+  )
 
-  private val host = Option(System.getenv("POSTGRES_HOST")).getOrElse("airflow")
-  private val port = Option(System.getenv("POSTGRES_PORT")).map(_.toInt).getOrElse(5432)
-  private val postgresDb = Option(System.getenv("POSTGRES_DB")).getOrElse("airflow")
-
-  private val connectTimeout = Option(System.getenv("CONNECT_TIMEOUT")).map(_.toInt).getOrElse(30)
-  private val currentSchema = Option(System.getenv("CURRENT_SCHEMA")).getOrElse("public")
-  private val charSet = Option(System.getenv("CHAR_SET")).getOrElse("UTF-8")
   private val dBmode = Option(System.getenv("MODE")).getOrElse("overwrite")
   private val dBformat = Option(System.getenv("DATABASE_FORMAT")).getOrElse("jdbc")
   private val dBDriver = Option(System.getenv("DATABASE_DRIVER")).getOrElse("org.postgresql.Driver")
