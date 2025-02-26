@@ -50,8 +50,8 @@ class DataPipeline(private var dataFrame: DataFrame = null,
       .format(dBformat)
       .option("driver", dBDriver)
       .option("url", dbUrl)
-      .option("user", "user")
-      .option("password", "bar") // TODO: secret's manager??
+      .option("user", dbConfig("user").toString)
+      .option("password", dbConfig("password").toString) // TODO: secret's manager??
       .option("dbtable", table)
       .load()
     this
