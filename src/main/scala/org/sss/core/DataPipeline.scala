@@ -16,9 +16,7 @@ import scala.math.BigDecimal.RoundingMode
 class DataPipeline(private var dataFrame: DataFrame = null,
                    private var metaData: Option[DataFrame] = null) extends DataPipelineabstract {
 
-  private val appName = System.getenv("APP_NAME")
   private val logger = Logger.getLogger(getClass.getName)
-
   private val spark = SparkSessionProvider.getSparkSession
   implicit val formats: DefaultFormats.type = DefaultFormats  // Required for extracting values (json4s)
 
